@@ -1147,7 +1147,7 @@ footer .copyright {
 
 .post .post-content {
   padding: 1rem;
-  width: 70%;
+  width: 100%;
 }
 
 .post .post-content .post-date,
@@ -1157,11 +1157,11 @@ footer .copyright {
 
 .post .post-content .post-title {
   margin: 0 0 10px;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 400;
 }
 
-.post .post-content .post-title a {
+.post a {
   font-family: 'PT Serif', serif;
   text-decoration: none;
   color: #263959;
@@ -1384,7 +1384,7 @@ a.newer-posts:hover {
   .post .post-content .post-title {
     margin: 0 0 5px;
   }
-  .post .post-content .post-title a {
+  .post a {
     font-size: 21px;
   }
 }
@@ -1475,7 +1475,7 @@ a.newer-posts:hover {
   .post .post-content .post-title {
     margin: 0 0 5px;
   }
-  .post .post-content .post-title a {
+  .post a {
     font-size: 21px;
   }
 }

@@ -1,4 +1,4 @@
-title: I'm Pavels Sisojevs, welcome!
+title: I'm Pavels, welcome!
 description: > # this means to ignore newlines until "baseurl:"
   Scala developer based in Zurich
 permalink: ':title/'
@@ -9,7 +9,7 @@ site-twitter: #if your site has a twitter account, enter it here
 # Author Settings
 author: Pavels Sisojevs # add your name
 author-img: me.jpg # add your photo
-about-author: Hi, I am a Scala developer based in Zurich, Switzerland. # add description
+about-author: Hi, I am a Scala developer based in Zurich, Switzerland. Functional programming explorer, ice hockey enthusiast.
 social-github: psisoyev # add your Github handle
 social-linkedin: pavels-sisojevs-10601534 # add your Linkedin handle
 social-email: p.sisoyev@gmail.com # add your Email address
