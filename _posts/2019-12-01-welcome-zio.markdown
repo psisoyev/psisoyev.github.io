@@ -3,7 +3,7 @@ layout: post
 title: Building your first multi-billion startup with ZIO
 date: 2019-11-12 13:37:00 +0100
 description: This post will help you to get started with building a Scala application with ZIO
-img: welcome-zio/conversation.png # Add image post (optional)
+img: welcome-zio/my-pager.png # Add image post (optional)
 tags: [Scala, ZIO, htt4ps, canoe]
 comments: true
 ---
@@ -17,7 +17,7 @@ This post doesn't cover most of the functionality but will be useful for you to 
 I will not go into details of specific terms and will provide links for you to do your own research. 
 The intent of the post is to familiarize you with the library on a high level.    
 We will see how to create services with ZIO and how to integrate it with libraries written in Tagless Final style.    
-In the next chapters, I will cover more specific parts of ZIO ecosystem. 
+In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library. 
 
 ### The problem to solve
 
@@ -31,15 +31,13 @@ This bot will manage and store a user-defined list of GitHub repositories, that 
 When a new repository version is released user should receive a notification if he has subscribed to this repository. 
 Lets call it a "release [pager](https://en.wikipedia.org/wiki/Pager)".
 
-![Service diagram]({{site.baseurl}}/assets/img/welcome-zio/services.png#center)
-
 Scala ecosystem is broad and there are different approaches and frameworks to build applications. 
 ZIO is one of the newest libraries in the ecosystem and is advertised as a library, that can simplify software development with Scala, which would make its users more efficient.
 As I like to explore the world of functional programming I decided to try it out and share my experience with you.  
 
 According to [documentation](https://zio.dev/docs/overview/overview_index) ZIO is a library for asynchronous and concurrent programming that promotes pure functional programming.
 If functional programming is something you like or you feel interested in it, this should spark some curiosity in you. 
-###### Did I say Spark? 
+###### Who said Spark? 
 
 Let's take a look at what ZIO can offer us.
 ZIO allows you to build your programs in a "lazy" fashion. You describe how your program should behave in [pure functions](https://en.wikipedia.org/wiki/Pure_function).
@@ -99,7 +97,7 @@ Then all the common code would move to `common-service` module and all source-sp
 
 ##### Project structure might be quite controversial and I'm still experimenting with it.
 
-![Project structure]({{site.baseurl}}/assets/img/welcome-zio/project-structure.png)
+![Project structure]({{site.baseurl}}/assets/img/welcome-zio/project-structure.png#center)
 
 #### Design your services
 Usually, I start with drafting logical services or in [Tagless Final](http://okmij.org/ftp/tagless-final/index.html) terms - defining algebras.
@@ -109,7 +107,7 @@ Lets put it even more strict - you should never care about the implementation de
 That is why I would advise designing all the services against interfaces (or algebras). This will come handy in unit testing.
 Also, as we use pure functions we do not expect any side effects in a method before we run the returned effect.
 
-[-- Service diagram --]
+![Service diagram]({{site.baseurl}}/assets/img/welcome-zio/services.png#center)
 
 This is a release pager service diagram. This diagram visualizes dependencies between services. 
 Here we check that we have divided our services into separate logical pieces.
