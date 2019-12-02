@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Building your first multi-billion startup with ZIO
-date: 2019-11-12 13:37:00 +0100
+date: 2019-12-12 13:37:00 +0100
 description: This post will help you to get started with building a Scala application with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
 tags: [Scala, ZIO, htt4ps, canoe]
@@ -163,7 +163,10 @@ Above you can see the definition of the subscription service interface.
 Here we have defined several actions that this service can handle.
 All the methods return type is `zio.Task`. This is a type alias to `ZIO[Any, Throwable, A]`.
 
-If you already heard about ZIO data type you know that type arguments are ???   
+If you already heard about `ZIO[-R, +E, +A]` data type you know that type arguments are:
+* R - type of environment required by the effects
+* E - error type
+* A - return type
 
 In this case, the environment type is not required, but there might be an exception thrown by the DB layer (eg. lost DB connection).
 Usually, I would catch expected errors and wrap them into a typed error. Here to keep things simple I'll leave `Throwable`.
