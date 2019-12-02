@@ -1,65 +1,69 @@
 ---
 layout: post
 title: Building your first multi-billion startup with ZIO
-date: 2019-11-01 13:37:00 +0100
+date: 2019-11-12 13:37:00 +0100
 description: This post will help you to get started with building a Scala application with ZIO
-img: conversation.jpg # Add image post (optional)
-fig-caption: # Add figcaption (optional)
+img: welcome-zio/conversation.png # Add image post (optional)
 tags: [Scala, ZIO, htt4ps, canoe]
 comments: true
 ---
 
 This post will help you to get started with building a Scala application with ZIO.
 
-Today there are tons of libraries in Scala ecosystem, which promise to improve your efficiency. 
-I wrote this blog post in order to help you to start with the new guy in the neighbourhood - [ZIO](https://zio.dev/). 
-The library is really broad and provides you powerful tools to build concurrent applications.  
-This post doesn't cover most of the functionality, but will be useful for you to start with something bigger than a Hello World app.
-I will not go into details of specific terms and will provide links for you to do your own research.
+Today there is lots of libraries in Scala ecosystem, which promise to improve your efficiency. 
+I wrote this post in order to help you to start with the new guy in the neighborhood - [ZIO](https://zio.dev/). 
+It is a huge library that provides you powerful tools to build concurrent applications and its own ecosystem.  
+This post doesn't cover most of the functionality but will be useful for you to start with something bigger than a Hello World app.
+I will not go into details of specific terms and will provide links for you to do your own research. 
+The intent of the post is to familiarize you with the library on a high level.    
 We will see how to create services with ZIO and how to integrate it with libraries written in Tagless Final style.    
-In the next chapters I will cover more specific parts of ZIO ecosystem. 
+In the next chapters, I will cover more specific parts of ZIO ecosystem. 
 
-### The problem
+### The problem to solve
 
-###### Disclaimer: at work we always look for tools that solve our problems and usually we shouldn't look for problems to solve with our beloved tools. Otherwise we end up with a zoo of different technologies that is not sustainable.  
+###### At work, we always look for tools that solve our problems and usually we are not looking for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that are not sustainable.  
  
-Whenever you start a new project you have to select technologies that fit your needs and solves your business problem. 
+Whenever you start a new project you have to select technologies that fit your needs and solve your business problem. 
 Scala ecosystem is diverse and can provide you with various different approaches and techniques that can solve the very same business problem.
-Lets imagine you have to build a Telegram bot, which will connect to [Telegram API](https://core.telegram.org/bots/api){:target="_blank"} and interact with user input.
-This bot will manage and store user defined list of GitHub repositories, that it will automatically check for new releases.
+
+Let's imagine you have to build a Telegram bot, which will connect to [Telegram API](https://core.telegram.org/bots/api){:target="_blank"} and interact with user input.
+This bot will manage and store a user-defined list of GitHub repositories, that will automatically check for new releases.
 When a new repository version is released user should receive a notification if he has subscribed to this repository. 
 Lets call it a "release [pager](https://en.wikipedia.org/wiki/Pager)".
 
-![Service diagram]({{site.baseurl}}/assets/img/start-with-zio/services.png#center)
+![Service diagram]({{site.baseurl}}/assets/img/welcome-zio/services.png#center)
 
 Scala ecosystem is broad and there are different approaches and frameworks to build applications. 
 ZIO is one of the newest libraries in the ecosystem and is advertised as a library, that can simplify software development with Scala, which would make its users more efficient.
-I am quite curious in these kind of things and decided to try it out. In this article I would like to share my experience with it.  
+As I like to explore the world of functional programming I decided to try it out and share my experience with you.  
 
 According to [documentation](https://zio.dev/docs/overview/overview_index) ZIO is a library for asynchronous and concurrent programming that promotes pure functional programming.
-We love functional programming, right? Lets take a look what ZIO can offer us.
+If functional programming is something you like or you feel interested in it, this should spark some curiosity in you. 
+###### Did I say Spark? 
+
+Let's take a look at what ZIO can offer us.
 ZIO allows you to build your programs in a "lazy" fashion. You describe how your program should behave in [pure functions](https://en.wikipedia.org/wiki/Pure_function).
 These functions return data structures that are called "functional effects". You combine these effects into a program, which you run only once, on the very top level.
-If you are not familiar with this concept I would recommend you to watch [this presentation](https://youtu.be/30q6BkBv5MY).
+If you are not familiar with this concept I would recommend you watch [this presentation](https://youtu.be/30q6BkBv5MY).
 
 ZIO can help you to handle dependency injection in your project. Usually, I don't use any dependency injection frameworks in Scala. 
-I have all the services initialised in the `Main` class and passed to dependent services via class constructors.   
+I have all the services initialized in the `Main` class and passed to dependent services via class constructors.   
 With ZIO the approach is a bit similar, but not exactly the same. 
 You instantiate your services in the `Main` class, but you don't need to pass services to each other. 
 That was a spoiler, you will see how to wire up the dependencies later in this article.
 
-Also ZIO provides you with ZTest - testing framework, which is really handy to test your functional effects. 
-I will share my experience with this framework in the next blog post.  
+Also, ZIO provides you with ZTest - testing framework, which is really handy to test your functional effects. 
+I will share my experience with this framework in the next post.  
 
 ### The solution
 
 #### Defining project modules
 Before jumping into business logic implementation I start with structuring the application and specifically with defining SBT modules.  
-Usually I split application modules into technical layers. This gives me a simple directed module dependency graph.
-For instance, domain model module will never know about any other modules (eg. storage), but storage module will depend on domain model module. 
-As the service module depends on storage module it will also depend on domain module transitively.  
+Usually, I split application modules into technical layers. This gives me a simple directed module dependency graph.
+For instance, the domain model module will never know about any other modules (eg. storage), but the storage module will depend on the domain model module. 
+As the service module depends on the storage module it will also depend on the domain module transitively.  
 
-![SBT modules]({{site.baseurl}}/assets/img/start-with-zio/sbt-modules.png#center) 
+![SBT modules]({{site.baseurl}}/assets/img/welcome-zio/sbt-modules.png#center) 
 
 In my SBT file I define a project for every module:
 ```scala
@@ -69,16 +73,16 @@ lazy val service = project
   .dependsOn(storage)                                    // 3
 ```
 
-In code above we define module `service`, which will be created in the root of the project. 
-Below I will describe in detail what is going on using numbered list (check numbers in the code comments above). 
+In the code above we define module `service`, which will be created at the root of the project. 
+Below I will describe in detail what is going on using the numbered list (check numbers in the code comments above). 
 1. Set common module [settings](https://github.com/psisoyev/release-pager/blob/28ec2730686827b3b71b4f7d581b47f23376d478/project/Settings.scala#L8)
 2. Set `service` module library dependencies
-3. Define dependency to the `storage` module
+3. Define dependency on the `storage` module
 
 #### Defining project packages
 Separating your business logic into logical pieces makes maintainability and readability of your code much easier. 
 We already have defined one separation axis - technical layers. These layers are separated from each other using project modules.
-Lets define second separation axis - business logic. This is achievable with packages. 
+Let's define the second separation axis - business logic. This is achievable with packages. 
 I would not recommend having packages like `service`, `repository` etc in your application if it is not a part of your business domain. 
 
 **Good:** 
@@ -89,41 +93,41 @@ I would not recommend having packages like `service`, `repository` etc in your a
 * io.pager.service
 * io.pager.repository
 
-If at some point there will be need to extract subscription service into a separate micro service we can easily go through all modules and extract it. 
+If at some point there will need to extract subscription service into a separate microservice we can easily go through all modules and extract it. 
 If we would have 2 repository lookup sources I would create 2 separate SBT modules. For example, `github-service` and `gitlab-service`. 
-Then all the common code would move to `common-service` module and all source-specific logic would stay in it's own SBT module. 
+Then all the common code would move to `common-service` module and all source-specific logic would stay in its own SBT module. 
 
-###### Project structure might be quite controversial and I'm still experimenting with it.
+##### Project structure might be quite controversial and I'm still experimenting with it.
 
-![Project structure]({{site.baseurl}}/assets/img/project-structure.png)
+![Project structure]({{site.baseurl}}/assets/img/welcome-zio/project-structure.png)
 
 #### Design your services
-Usually I start with drafting logical services or in [Tagless Final](http://okmij.org/ftp/tagless-final/index.html) terms - defining algebras.
+Usually, I start with drafting logical services or in [Tagless Final](http://okmij.org/ftp/tagless-final/index.html) terms - defining algebras.
 Dependent services will always call interface methods, so whenever you make changes in the implementation of a method of `serviceA`, 
 it is important that dependent `serviceB` won't even know about this. 
-Lets put it even more strict - you should never care about implementation details of a service that you call.
-That is why I would advise to design all the services against interfaces (or algebras). This will come handy in unit testing.
+Lets put it even more strict - you should never care about the implementation details of a service that you call.
+That is why I would advise designing all the services against interfaces (or algebras). This will come handy in unit testing.
 Also, as we use pure functions we do not expect any side effects in a method before we run the returned effect.
 
 [-- Service diagram --]
 
-This is release pager service diagram. This diagram visualises dependencies between services. 
+This is a release pager service diagram. This diagram visualizes dependencies between services. 
 Here we check that we have divided our services into separate logical pieces.
 
 #### Getting started with ZIO
 
-Lets begin with service definition. I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern) to structure the application. 
-Every module will be expressed as a trait. Inside of this trait we have a service definition, which we will be overridden by the implementation(s).
+Let's begin with the service definition. I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern) to structure the application. 
+Every module will be expressed as a trait. Inside of this trait, we have a service definition, which we will be overridden by the implementation(s).
 It is recommended to use descriptive names in the service definition to avoid name clashes. 
-We will create instances of the service dependency tree at the very top level in `Main` class and compilator won't allow to have name collisions.
+We will create instances of the service dependency tree at the very top level in `Main` class and compilator won't allow having name collisions.
 What is good about the module pattern? All the dependencies will be checked at the compile time. 
 And you can have circular dependencies. Is it good? In my opinion - no. 
 Having circular dependencies for me is a clear sign of bad service design which can be solved by separation of concerns. 
-On the very top level you select specific implementations of the dependencies. We'll see it later, when will go through the `Main` class.
+On the very top level, you select specific implementations of the dependencies. We'll see it later when will go through the `Main` class.
 
 As you could see in the service diagram the heart of the application is subscription service. 
 It should know how to store user subscriptions, repository versions and also how to retrieve them. 
-Lets define the subscription logic module:
+Let's define the subscription logic module:
 
 ```scala
 trait SubscriptionLogic {
@@ -131,7 +135,7 @@ trait SubscriptionLogic {
 }
 ```
 
-###### If you have visited module pattern link above, you saw that service definitions have environment type parameter - `Service[R]`. It is useful in testing and will be covered in the next chapter.
+##### If you have visited the module pattern link above, you saw that service definitions have environment type parameter - `Service[R]`. It is useful in testing and will be covered in the next chapter.
 
 Here we have defined `SubscriptionLogic` module, which has subscription service definition. 
 In the current version of ZIO docs service definition uses `val` instead of `def`, but I prefer the latter. 
@@ -155,19 +159,19 @@ object SubscriptionLogic {
 }
 ``` 
 
-Above you can see definition of the subscription service interface. 
-###### I'm not calling it an algebra since I'm not abstracting to `F[_]`, but using specific return type. 
+Above you can see the definition of the subscription service interface. 
+##### I'm not calling it an algebra since I'm not abstracting to `F[_]`, but using specific return type. 
 
 Here we have defined several actions that this service can handle.
 All the methods return type is `zio.Task`. This is a type alias to `ZIO[Any, Throwable, A]`.
 
 If you already heard about ZIO data type you know that type arguments are ???   
 
-In this case environment is not required, but there might be an exception thrown by DB layer (eg. lost DB connection).
-Usually I would catch expected errors and wrap them into a typed error. Here to keep things simple I'll leave `Throwable`.
+In this case, the environment type is not required, but there might be an exception thrown by the DB layer (eg. lost DB connection).
+Usually, I would catch expected errors and wrap them into a typed error. Here to keep things simple I'll leave `Throwable`.
 
-To implement the logic we have to override SubscriptionLogic trait. 
-There are two ways organize your implementations: either put all your implementations inside of the companion object or to create a separate file in the same package.
+To implement the logic we have to override `SubscriptionLogic` trait. 
+There are two ways to organize your implementations: either put all your implementations inside of the companion object or to create a separate file in the same package.
 What is the difference? If you will have a service with several implementations it won't be convenient to navigate in several thousands of lines.   
 In this specific case I have only one implementations and that is why I implement this service inside of the companion object.
 
@@ -190,16 +194,16 @@ trait Live extends SubscriptionLogic {
   ... // skipped the rest
 ``` 
 
-I won't put the whole implementation in to this snippet, you should get the idea. You can find the full implementation on [GitHub](https://github.com/psisoyev/release-pager). 
+I won't put the whole implementation into this snippet, you should get the idea. You can find the full implementation on [GitHub](https://github.com/psisoyev/release-pager). 
 This `SubscriptionLogic` implementation has three dependencies: a logger, chat storage and repository version storage.
-Other implementation of this logic might have totally different set of dependencies or even have no dependencies at all.
-We will skip Logger because actually we shouldn't write our own logger or with other words re-invent a bicycle and just use some ready-to-use library.
+Other implementation of this logic might have a totally different set of dependencies or even have no dependencies at all.
+We will skip Logger because actually, we shouldn't write our own logger or with other words re-invent a bicycle and just use some ready-to-use library.
 At the moment of writing [ZIO-logging](https://github.com/zio/zio-logging) is in early development, so I decided to wait for it and wrote a simple logger myself.
 
-In the code above we see implementation of two functions, which log user action and call chat storage.
-For those, who find function aliases unreadable or not familiar with them, `*>` or an "ice cream" as I call it, is just an alias to `flatMap` function, which drops the result of previous computation.   
-Here subscription logic don't have any clue how the storage will work and it should not change. 
-I would note that I use word `storage` for services, that know how to save the data. This name is quite abstract and doesn't imply any implementation details.
+In the code above we see the implementation of two functions, which log user action and call chat storage.
+For those, who find function aliases unreadable or not familiar with them, `*>` or an "ice cream" as I call it, is just an alias to `flatMap` function, which drops the result of the previous computation.   
+Here subscription logic doesn't have any clue how the storage will work and it should not change. 
+I would note that I use the word `storage` for services, that know how to save the data. This name is quite abstract and doesn't imply any implementation details.
 Why? Let's as an example pick `ChatStorage`. I have created two versions of the storage and one of them is not using a database, it is in-memory. Take a look:   
 
 ```scala
@@ -222,14 +226,14 @@ object ChatStorage {
 This is the definition of our storage logic. 
 1. list all the subscriptions for a specific chat
 2. list all the subscribers for a specific repository
-3. add new subscriber to a repository
+3. add a new subscriber to a repository
 4. remove a subscriber from a repository
 
 As I mentioned before there might be two or more implementations - I will have in-memory and using a SQL database. 
-In scope of this article we will use only the in-memory implementation. We create a `Ref` of a map and work with it.
+In the scope of this article, we will use only the in-memory implementation. We create a `Ref` of a map and work with it.
 `Ref` is a mutable reference to a value, which in this case is an immutable Map that stores all chat subscriptions (repository names).
-ZIO takes care of the concurrent operations on `Ref` and guarantees atomicity of all operations on the Map. 
-Here the requirements from the service are quite low - to be able to read the current state and update it when user is changing his subscription list. Concurrently, of course.
+ZIO takes care of the concurrent operations on `Ref` and guarantees the atomicity of all operations on the Map. 
+Here the requirements from the service are quite low - to be able to read the current state and update it when the user is changing his subscription list. Concurrently, of course.
 
 ```scala
 trait InMemory extends ChatStorage {
@@ -262,17 +266,17 @@ trait InMemory extends ChatStorage {
   }
 ``` 
 
-In this relatively small code snippet a lot of stuff is happening. 
-As you might noticed, return type of all the methods is not `Task` as in the interface, but `UIO`.
+In this relatively small code snippet, a lot of stuff is happening. 
+As you might have noticed, the return type of all the methods is not `Task` as in the interface, but `UIO`.
 `UIO` is used when you are sure that all the operations are pure and nothing can break. 
-ZIO can guarantee that operations on `Ref` are pure, but it has no control on your actions. 
-If you want to throw an exception inside of the update function - you can do it, compiler does allow that. Should you do it? Never.
-Writing code with functional effects requires attention and discipline. Also, it's always great to have a code review afterwards.
+ZIO can guarantee that operations on `Ref` are pure, but it has no control over your actions. 
+If you want to throw an exception inside of the update function - you can do it, the compiler does allow that. Should you do it? Never.
+Writing code with functional effects requires attention and discipline. Also, it's always great to have a code review afterward.
 The difference between `Task` and `UIO` is that error type of `UIO` is `Nothing` instead of `Throwable`. 
 Having this we can expect that this function will not fail.
 
 Updating the value inside `Ref` is simple. Just call `update`, take the provided state and change it.
-That is why we have defined `updateSubscriptions` function, which gets current value of `Ref`, finds user subscriptions and updates them with provied function.
+That is why we have defined `updateSubscriptions` function, which gets the current value of `Ref`, finds user subscriptions and updates them with provided function.
 So far we have only two functions - add and remove a subscription. The difference is in one sign: `+` in case of addition and `-` in case of deletion.        
 
 Reading the value is even simpler - you just need to call `get` on `Ref` and you have the current state. 
@@ -293,21 +297,22 @@ trait Doobie extends ChatStorage {
 }
 ```   
 
-I skipped actual implementation, but you can see that now there is different set of dependencies comparing to `InMemory` implementation. 
+I skipped actual implementation, but you can see that now there is a different set of dependencies comparing to `InMemory` implementation. 
 We don't need to have `Ref` as we will keep the values in a database. Now we have `doobie.util.transactor.Transactor` as the only dependency. 
 
 Now, if we want to replace `InMemory` implementation with `Doobie` implementation we have to do changes only in one place - the `Main` class where all the services are wired together. 
 As we design our services against interfaces we don't care about implementation details of the dependee, so `SubscriptionLogic` implementations won't be affected by the change. 
 
-Now we should have some basic understanding on how to build a business logic service with ZIO. 
+Now we should have some basic understanding of how to build a business logic service with ZIO. 
 
-#### Integrating ZIO with library written in Tagless Final style
-Let's take a look on another important part of the application. 
+#### Integrating ZIO with a library written in Tagless Final style
+Let's take a look at another important part of the application. 
 In order to call Telegram API I have chosen [canoe](https://github.com/augustjune/canoe)`.  
 Canoe is one of the Telegram API implementation libraries. It is a pure functional library for building Telegram bots written in Scala using Tagless Final style.  
-Let's take a look how ZIO can integrate with it.
+Let's take a look at how ZIO can integrate with it.
 
-As it was mentioned before, we want our users to interact with the bot. We have to define list of commands that the bot will understand:
+As it was mentioned before, we want our users to interact with the bot. We have to define the list of commands that the bot will understand:
+
 ```text
 /help Shows help menu
 /add  Subscribe to GitHub project releases
@@ -343,7 +348,7 @@ object ScenarioLogic {
 }
 ``` 
 
-Above we have defined list of commands the bot will handle. Let's implement defined scenarios with `canoe`. 
+Above we have defined the list of commands the bot will handle. Let's implement defined scenarios with `canoe`. 
 I will skip some parts of the implementation, but you can find the full version [here](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/client/telegram/ScenarioLogic.scala).
 
 ```scala
@@ -366,11 +371,12 @@ trait CanoeScenarios extends ScenarioLogic[Scenario] {
 }
 ``` 
 
-Let's go through code above. 
-We start with extending `ScenarioLogic` module. Here we pass `Scenario` type, which is defined in `canoe` library to describe interaction between a chat and the bot. 
+Let's go through the code above. 
+We start by extending `ScenarioLogic` module. Here we pass `Scenario` type, which is defined in `canoe` library to describe the interaction between a chat and the bot. 
 There are 3 dependencies defined: implicit `canoe.api.TelegramClient` which is able to execute the scenarios, some implementation of `SubscriptionLogic` and `RepositoryValidator` to check user inputs.  
 
-Now let's see how do we implement addition of a new repository from user input. Let's go through the for comprehension line by line:
+Now let's see how do we implement the addition of a new repository from user input. Let's go through the for comprehension line by line:
+
 ```scala
 for {
   chat      <- Scenario.start(command("add").chat)
@@ -391,25 +397,25 @@ private def subscribe(chat: Chat, userInput: String, validated: IO[PagerError, N
   ).unit
 ```
 
-First thing we see, is that there are lots of calls on `Scenario` helper object, which members could be imported and the for comprehension would become a bit cleaner. 
+The first thing we see is that there are lots of calls on `Scenario` helper object, which members could be imported and the for comprehension would become a bit cleaner. 
 Also, we could implement an implicit conversion from `Task` to `Scenario` using `Scenario.eval`, but let's keep things simple.
-First of all we retrieve a reference to a chat, which called `/add` command. This reference will be used to send messages later. 
-We send instruction messages to user and expect some input from him. 
+First of all, we retrieve a reference to a chat, which called `/add` command. This reference will be used to send messages later. 
+We send instruction messages to the user and expect some input from him. 
 Then the input is validated by the `RepositoryValidator`. 
-`RepositoryValidator` returns a `IO` type, which is a bifunctor with an error and some type. 
+`RepositoryValidator` returns an `IO` type, which is a bifunctor with an error and some type. 
 To handle the result we call `foldM` function, which expects two functions - for success and error cases.  
-In case of success we notify user about it and call `SubscriptionLogic` to save the subscription.
-If the validation fails, we notify user about wrong issues with the input.
+In case of success, we notify the user about it and call `SubscriptionLogic` to save the subscription.
+If the validation fails, we notify the user about the wrong issues with the input.
 
 #### Wiring up
-If you read so far, you've seen several service definitions and hopefully you have high level picture of what we are doing here.
-At this point we could go through the rest of the service definition and implementation, but it's not very different from what we've already seen except some small details.
+If you read so far, you've seen several service definitions and hopefully, you have a high level picture of what we are doing here.
+At this point, we could go through the rest of the service definition and implementation, but it's not very different from what we've already seen except some small details.
 I think it would be interesting to see how we are starting the application and connect dependent services.
 
 There are several ways to run a ZIO application. 
 1. Build your program, create a custom `zio.Runtime` call `unsafeRun` on it and pass your program.
 2. Extend your `Main` object with `zio.App`. 
-If you are building application from scratch I don't see a good reason not to use second approach.
+If you are building an application from scratch I don't see a good reason not to use the second approach.
 
 Overriding the `App` forces also to override `run` method;
 
@@ -417,20 +423,21 @@ Overriding the `App` forces also to override `run` method;
 override def run(args: List[String]): ZIO[ZEnv, Nothing, Int]
 ```
 
-As you can see, program expects us to return a ZIO effect, which library will run. 
-First argument - `ZEnv` is default ZIO environment, that will provide you with:
+As you can see, the program expects us to return a ZIO effect, which the library will run. 
+The first argument - `ZEnv` is default ZIO environment, that will provide you with:
 * `Clock` - access to system time, sleep function
-* `Console` - access to console (printing, reading input)
+* `Console` - access to the console (printing, reading input)
 * `System` - access to environment variables
-* `Random` - access to randomizer
+* `Random` - access to the randomizer
 * `Blocking` - access to blocking thread pool
 
-From this set of built in services we will use: 
+From this set of built-in services we will use: 
 * `Clock`, to schedule GitHub repository latest version retrieval
-* `Console`, for the `ConsoleLogger`, to log stuff in std out
+* `Console`, for the `ConsoleLogger`, to log stuff in stdout
 * `System`, to retrieve environment variables
 
-Let's take a look how the whole program looks like:
+Let's take a look at how the whole program looks like:
+
 ```scala
 val program = for {
   token <- telegramBotToken
@@ -444,7 +451,6 @@ val program = for {
   _ <- startProgram(subscriberMap, subscriptionMap, http4sClient, canoeClient)
 } yield ()
 ```
-
 
 Summary
 We have seen several service implementation examples. We didn't dive too much into
