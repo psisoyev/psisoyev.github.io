@@ -549,8 +549,6 @@ Instead of having a diff you have the intersection of the expected and actual se
 [error] /Users/psisojevs/projects/release-pager/backend/src/main/scala/io/pager/Main.scala:89:11: type mismatch;
 [error]  found   : io.pager.client.telegram.TelegramClient.Canoe with io.pager.client.telegram.ScenarioLogic.CanoeScenarios with io.pager.logging.Logger.Console with zio.console.Console.Live with io.pager.subscription.SubscriptionLogic.Live with io.pager.subscription.ChatStorage.InMemory with io.pager.subscription.RepositoryVersionStorage.InMemory with io.pager.validation.RepositoryValidator.GitHub with io.pager.client.github.GitHubClient.Live with io.pager.client.http.HttpClient.Http4s with io.pager.lookup.ReleaseChecker.Live
 [error]  required: io.pager.client.telegram.TelegramClient with io.pager.lookup.ReleaseChecker with zio.clock.Clock
-[error]           new TelegramClient.Canoe with ScenarioLogic.CanoeScenarios with Logger.Console with Console.Live with SubscriptionLogic.Live
-[error]           ^
 ```
 
 Here, the missing part is `Clock` service. Is it obvious from the first sight? No. Is this something ZIO community can fix? I doubt. 
