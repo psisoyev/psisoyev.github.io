@@ -1481,6 +1481,6 @@ a.newer-posts:hover {
 }
 
 img[src*='#center'] {
-    display: block;
-    margin: auto;
+  display: block;
+  margin: auto;
 }
