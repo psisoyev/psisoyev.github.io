@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Building your first multi-billion startup with ZIO
-date: 2019-12-12 13:37:00 +0100
+date: 2019-11-12 13:37:00 +0100
 description: This post will help you to get started with building a Scala application with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
 tags: [Scala, ZIO, htt4ps, canoe]
@@ -21,7 +21,7 @@ In the next chapters, I would like to cover more specific parts of ZIO ecosystem
 
 ### The problem to solve
 
-###### At work, we always look for tools that solve our problems and usually we are not looking for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that are not sustainable.  
+##### At work, we always look for tools that solve our problems and usually we are not looking for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that are not sustainable.  
  
 Whenever you start a new project you have to select technologies that fit your needs and solve your business problem. 
 Scala ecosystem is diverse and can provide you with various different approaches and techniques that can solve the very same business problem.
@@ -95,9 +95,9 @@ If at some point there will need to extract subscription service into a separate
 If we would have 2 repository lookup sources I would create 2 separate SBT modules. For example, `github-service` and `gitlab-service`. 
 Then all the common code would move to `common-service` module and all source-specific logic would stay in its own SBT module. 
 
-##### Project structure might be quite controversial and I'm still experimenting with it.
+<img src="/assets/img/welcome-zio/project-structure.png#center" width="300">
 
-![Project structure]({{site.baseurl}}/assets/img/welcome-zio/project-structure.png#center)
+##### Project structure might be quite controversial and I'm still experimenting with it.
 
 #### Design your services
 Usually, I start with drafting logical services or in [Tagless Final](http://okmij.org/ftp/tagless-final/index.html) terms - defining algebras.
@@ -216,7 +216,7 @@ object ChatStorage {
   type SubscriptionMap = Map[ChatId, Set[Name]]
 
   trait Service {
-    def listSubscriptions(chatId: ChatId): Task[Set[Name]]            // 1
+    def listSubscriptions(chatId: ChatId): Task[Set[Name]]  // 1
     def listSubscribers(name: Name): Task[Set[ChatId]]      // 2
     def subscribe(chatId: ChatId, name: Name): Task[Unit]   // 3
     def unsubscribe(chatId: ChatId, name: Name): Task[Unit] // 4
@@ -453,22 +453,107 @@ val program = for {
 } yield ()
 ```
 
-Summary
-We have seen several service implementation examples. We didn't dive too much into
-zio-http instead of self made stuff 
+Here we prepare all the necessary inputs to start the program. As the first step, we retrieve Telegram bot token from environment variables.
+Then we create 2 `Ref` instances holding empty `Map` for `InMemory` repositories. Then we build `Http4s` client and `canoe` client. 
+These values are used to build the dependency tree. 
 
-As you may noticed I have not used Environment "hole" too much so far. It will change in the next chapter of the article series. 
+ZIO gives you the ability to use services, that you don't know how to instantiate or retrieve. 
+It sounds like a dependency injection framework, right? At least for me, a dependency framework in Scala is something that is optional and not necessary needed.
+However, as ZIO will check all the dependencies at compile time you still are responsible for the dependency management. 
 
-zio pros:
-cleaner than TF (no Monad[F] in business code)
-convenience methods like foldM etc
-explicit error type
+How that works?
+Let's take a look at the program itself:
+```scala
+val startTelegramClient    = ZIO.accessM[TelegramClient](_.telegramClient.start).fork
+val scheduleReleaseChecker =
+      ZIO
+        .accessM[ReleaseChecker with Clock](_.releaseChecker.scheduleRefresh)
+        .repeat(Schedule.fixed(Duration(1, TimeUnit.MINUTES)))
+val program                = startTelegramClient *> scheduleReleaseChecker
+```  
 
-zio cons:
-you are tied to ZIO :) 
-zio environment error messages are hard to read: example with removing one of the services in provide
+At the first line we start access a `TelegramClient`, that will be provided later, call `start` method on it and fork into a separate `Fiber`. 
+As I already mentioned `Fiber` details is out of scope of this article and will be covered in the next chapters. 
+For now, to keep things simple, imagine that we have spawned separate thread for it (it is not exactly correct, but you should get the point).
 
-conclusion:
-as always it's a matter of trade offs and depends on your needs. 
-if you are building a library i would go with TF approach, but if you are writing business logic code, I would go with ZIO.
-because zio comes with lots of convenience methods that simplify development
+Then we access some environment that has `ReleaseChecker` and `zio.Clock`. 
+The first is needed to call a `scheduleRefresh` function, which will go to GitHub API and will check for new repository versions.
+Second is needed to repeat the refresh effect every minute. In case of an error repeating will stop.
+
+We combine both effects using the "ice cream" (flatMap) method and now we have one program, which environment is `ReleaseChecker with Clock with TelegramClient`.
+The very last thing is to provide these missing services to the library and we are done. We have to fulfill all the dependency requirements of the services we defined before.
+For example if we want to use `TelegramClient.Canoe` we will have to provide also the `ScenarioLogic.CanoeScenarios` etc.
+
+At the end whole block of dependencies looks like this:
+```scala
+new TelegramClient.Canoe
+    with ScenarioLogic.CanoeScenarios
+    with Clock.Live
+    with Logger.Console
+    with Console.Live
+    with SubscriptionLogic.Live
+    with ChatStorage.InMemory
+    with RepositoryVersionStorage.InMemory
+    with RepositoryValidator.GitHub
+    with GitHubClient.Live
+    with HttpClient.Http4s
+    with ReleaseChecker.Live {
+      override def subscribers: Ref[SubscriberMap]         = subscriberMap
+      override def subscriptions: Ref[SubscriptionMap]     = subscriptionMap
+      override def client: Client[Task]                    = http4sClient
+      override implicit def canoeClient: CanoeClient[Task] = globalCanoeClient
+    }
+``` 
+
+The list is relatively long for such a small app, but I decided to split the logic into smaller pieces. 
+You can see the whole `Main` class [here](https://github.com/psisoyev/release-pager/blob/master/backend/src/main/scala/io/pager/Main.scala).
+Instead of own implementations of the logger and GitHub client, I should have used some ready solution. 
+At the time of writing, [ZIO-http](https://github.com/zio/zio-http) and [ZIO-logging](https://github.com/zio/zio-logging) are in active development, so I decided not to use them.
+Also, I'm almost sure there is some working GitHub API client Scala wrapper, but for our needs (only checking the last repository version) adding a new dependency is a bit too much.  
+
+### Summary
+I'm happy if you have read until this point.
+This is my very first blog post and I would like to start a blog post series with it. 
+As this is really a high-level introduction to ZIO capabilities this article doesn't focus on specific things, it doesn't compare ZIO with other solutions.
+ 
+I showed how I am organizing code in my projects. I feel that this can be a topic for a separate article.
+I have introduced you to ZIO. You are not close friends yet, but we'll get there eventually.
+We have seen how to design and implement several services. We have seen how to build dependencies between these services. 
+Also, we've used ZIO environment to create service instances and start the program.
+
+As you may have noticed I have not used Environment "hole" too much so far. It will change in the next chapter of the article series about unit testing.
+
+How do I feel about ZIO? Excited, maybe. 
+It took me a while to find the best way of doing dependency injection. 
+Initially, I thought it would be a good idea to use the environment everywhere, but I ended up with implementation leaking to other services via transitive dependencies.
+As I'm using release candidate version of ZIO I understand all the risks of developing an application in such an environment. 
+It means API can change, it means there might be dependency incompatibilities. There might be libraries, which are slower to move to newer versions.  
+
+However, according to conversations in [ZIO discord](https://discord.gg/2ccFBr4) it seems that 1.0.0 release is coming really soon and will bring some stability.
+
+Would I recommend ZIO? It depends.
+Of course, it depends on what you are building. 
+If you are building your own multi-billion startup which won't go live next Tuesday I would go for it. 
+If you are building some general-purpose library, which would not be a part of ZIO ecosystem? Emm, yes. Why I'm not so sure? There are still people who are afraid of 'z' in the library names.  
+Also there are pros and cons to use Tagless Final style for this purpose. Such a comparison deserves a separate article. 
+If your team is not very proficient with trendy functional programming terms like ~~EJB, inheritance~~ "effect", "Tagless Final", it might be challenging. 
+That of course depends on people, project requirements and deadlines. 
+Functional programming requires attention, discipline and of course understanding of the things you do (that applies to any kind of programming, tho).
+However, If you are familiar with Cats Effect, ZIO shouldn't be hard for you. Lots of concepts are similar, but some terminology might differ. 
+With terminology of course I mean not the theory behind all of this, but some implementation methods. 
+ZIO provides a lot of convenience methods, e.g. `foldM` we saw before. Of course, you can use ZIO in your Tagless Final services as the effect type.
+
+Handling missing dependencies might be challenging in big dependency trees as error messages provided by the compiler are quite long. 
+Instead of having a diff you have the intersection of the expected and actual set of services. Example:
+```scala
+[error] /Users/psisojevs/projects/release-pager/backend/src/main/scala/io/pager/Main.scala:89:11: type mismatch;
+[error]  found   : io.pager.client.telegram.TelegramClient.Canoe with io.pager.client.telegram.ScenarioLogic.CanoeScenarios with io.pager.logging.Logger.Console with zio.console.Console.Live with io.pager.subscription.SubscriptionLogic.Live with io.pager.subscription.ChatStorage.InMemory with io.pager.subscription.RepositoryVersionStorage.InMemory with io.pager.validation.RepositoryValidator.GitHub with io.pager.client.github.GitHubClient.Live with io.pager.client.http.HttpClient.Http4s with io.pager.lookup.ReleaseChecker.Live
+[error]  required: io.pager.client.telegram.TelegramClient with io.pager.lookup.ReleaseChecker with zio.clock.Clock
+[error]           new TelegramClient.Canoe with ScenarioLogic.CanoeScenarios with Logger.Console with Console.Live with SubscriptionLogic.Live
+[error]           ^
+```
+
+Here, the missing part is `Clock` service. Is it obvious from the first sight? No. Is this something ZIO community can fix? I doubt. 
+Can you fix it your self? Probably, by splitting these services into groups.
+
+Will I continue using ZIO myself? Sure. I wan't to go further and explore error handling a bit more, unit testing possibilities, streams.
