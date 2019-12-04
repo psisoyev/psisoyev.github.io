@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Implementing your first multi-billion startup with ZIO
+title: Welcome the new guy - ZIO
 date: 2019-11-12 13:37:00 +0100
-description: This post will help you to start building a Scala applications with ZIO
+description: This post will help you to start building Scala applications with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
 tags: [Scala, ZIO, htt4ps]
 comments: true
