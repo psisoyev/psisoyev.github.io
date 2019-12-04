@@ -57,9 +57,9 @@ I will share my experience with this framework in the next post.
 
 #### Getting started with ZIO
 
-In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined services that we have to implement.  
+In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined logical services that we have to implement. Now we have to implement them.    
 
-Let's begin with the service definition. I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern) to structure the application. 
+To structure the application services I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern). 
 Every module will be expressed as a trait. Inside of this trait, we have a service definition, which we will be overridden by the implementation(s).
 It is recommended to use descriptive names in the service definition to avoid name clashes. 
 We will create instances of the service dependency tree at the very top level in `Main` class and compilator won't allow having name collisions.
@@ -477,7 +477,7 @@ It means API can change, it means there might be dependency incompatibilities. T
 However, according to conversations in [ZIO discord](https://discord.gg/2ccFBr4) it seems that 1.0.0 release is coming really soon and will bring some stability.
 
 Would I recommend ZIO? It depends.
-Of course, it depends on what you are building. 
+It depends on what you are trying to build. 
 If you are building your own multi-billion startup which won't go live next Tuesday I would go for it. 
 If you are building some general-purpose library, which would not be a part of ZIO ecosystem? Emm, yes. Why I'm not so sure? There are still people who are afraid of 'z' in the library names.  
 Also there are pros and cons to use Tagless Final style for this purpose. Such a comparison deserves a separate article. 
