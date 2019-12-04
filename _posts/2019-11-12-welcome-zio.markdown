@@ -1,19 +1,20 @@
 ---
 layout: post
-title: Building your first multi-billion startup with ZIO
+title: Implementing your first multi-billion startup with ZIO
 date: 2019-11-12 13:37:00 +0100
-description: This post will help you to get started with building a Scala application with ZIO
+description: This post will help you to start building a Scala applications with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
-tags: [Scala, ZIO, htt4ps, canoe]
+tags: [Scala, ZIO, htt4ps]
 comments: true
 ---
 
-This post will help you to get started with building a Scala application with ZIO.
+This post will help you to start building a Scala applications with ZIO.
 
 Today there is lots of libraries in Scala ecosystem, which promise to improve your efficiency. 
 I wrote this post in order to help you to start with the new guy in the neighborhood - [ZIO](https://zio.dev/). 
 It is a huge library that provides you powerful tools to build concurrent applications and its own ecosystem.  
-This post doesn't cover most of the functionality but will be useful for you to start with something bigger than a Hello World app.
+
+This post doesn't cover most of the functionality but will be useful for you to start with something bigger than a 'Hello World' app.
 I will not go into details of specific terms and will provide links for you to do your own research. 
 The intent of the post is to familiarize you with the library on a high level.    
 We will see how to create services with ZIO and how to integrate it with libraries written in Tagless Final style.    
