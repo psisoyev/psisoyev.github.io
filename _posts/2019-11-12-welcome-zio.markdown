@@ -17,19 +17,19 @@ This post doesn't cover most of the functionality but will be useful for you to 
 I will not go into details of specific terms and will provide links for you to do your own research. 
 The intent of the post is to familiarize you with the library on a high level.    
 We will see how to create services with ZIO and how to integrate it with libraries written in Tagless Final style.    
-In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library. 
+In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
+
+If you prefer code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
 
 ### The problem to solve
 
 ##### At work, we always look for tools that solve our problems and usually we are not looking for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that are not sustainable.  
+
+In [the previous article]({{site.baseurl}}/design-a-pager/) I have defined a problem that needs to be solved. 
+If you haven't read it yet, I would recommend checking it before you proceed with this one.
  
 Whenever you start a new project you have to select technologies that fit your needs and solve your business problem. 
 Scala ecosystem is diverse and can provide you with various different approaches and techniques that can solve the very same business problem.
-
-Let's imagine you have to build a Telegram bot, which will connect to [Telegram API](https://core.telegram.org/bots/api){:target="_blank"} and interact with user input.
-This bot will manage and store a user-defined list of GitHub repositories, that will automatically check for new releases.
-When a new repository version is released user should receive a notification if he has subscribed to this repository. 
-Lets call it a "release [pager](https://en.wikipedia.org/wiki/Pager)".
 
 Scala ecosystem is broad and there are different approaches and frameworks to build applications. 
 ZIO is one of the newest libraries in the ecosystem and is advertised as a library, that can simplify software development with Scala, which would make its users more efficient.
@@ -37,7 +37,7 @@ As I like to explore the world of functional programming I decided to try it out
 
 According to [documentation](https://zio.dev/docs/overview/overview_index) ZIO is a library for asynchronous and concurrent programming that promotes pure functional programming.
 If functional programming is something you like or you feel interested in it, this should spark some curiosity in you. 
-###### Who said Spark? 
+##### Who said Spark? 
 
 Let's take a look at what ZIO can offer us.
 ZIO allows you to build your programs in a "lazy" fashion. You describe how your program should behave in [pure functions](https://en.wikipedia.org/wiki/Pure_function).
@@ -55,64 +55,9 @@ I will share my experience with this framework in the next post.
 
 ### The solution
 
-#### Defining project modules
-Before jumping into business logic implementation I start with structuring the application and specifically with defining SBT modules.  
-Usually, I split application modules into technical layers. This gives me a simple directed module dependency graph.
-For instance, the domain model module will never know about any other modules (eg. storage), but the storage module will depend on the domain model module. 
-As the service module depends on the storage module it will also depend on the domain module transitively.  
-
-![SBT modules]({{site.baseurl}}/assets/img/welcome-zio/sbt-modules.png#center) 
-
-In my SBT file I define a project for every module:
-```scala
-lazy val service = project
-  .settings(commonSettings)                              // 1
-  .settings(libraryDependencies ++= serviceDependencies) // 2 
-  .dependsOn(storage)                                    // 3
-```
-
-In the code above we define module `service`, which will be created at the root of the project. 
-Below I will describe in detail what is going on using the numbered list (check numbers in the code comments above). 
-1. Set common module [settings](https://github.com/psisoyev/release-pager/blob/28ec2730686827b3b71b4f7d581b47f23376d478/project/Settings.scala#L8)
-2. Set `service` module library dependencies
-3. Define dependency on the `storage` module
-
-#### Defining project packages
-Separating your business logic into logical pieces makes maintainability and readability of your code much easier. 
-We already have defined one separation axis - technical layers. These layers are separated from each other using project modules.
-Let's define the second separation axis - business logic. This is achievable with packages. 
-I would not recommend having packages like `service`, `repository` etc in your application if it is not a part of your business domain. 
-
-**Good:** 
-* io.pager.subscription
-* io.pager.lookup
-
-**Bad:** 
-* io.pager.service
-* io.pager.repository
-
-If at some point there will need to extract subscription service into a separate microservice we can easily go through all modules and extract it. 
-If we would have 2 repository lookup sources I would create 2 separate SBT modules. For example, `github-service` and `gitlab-service`. 
-Then all the common code would move to `common-service` module and all source-specific logic would stay in its own SBT module. 
-
-<img src="/assets/img/welcome-zio/project-structure.png#center" width="300">
-
-##### Project structure might be quite controversial and I'm still experimenting with it.
-
-#### Design your services
-Usually, I start with drafting logical services or in [Tagless Final](http://okmij.org/ftp/tagless-final/index.html) terms - defining algebras.
-Dependent services will always call interface methods, so whenever you make changes in the implementation of a method of `serviceA`, 
-it is important that dependent `serviceB` won't even know about this. 
-Lets put it even more strict - you should never care about the implementation details of a service that you call.
-That is why I would advise designing all the services against interfaces (or algebras). This will come handy in unit testing.
-Also, as we use pure functions we do not expect any side effects in a method before we run the returned effect.
-
-![Service diagram]({{site.baseurl}}/assets/img/welcome-zio/services.png#center)
-
-This is a release pager service diagram. This diagram visualizes dependencies between services. 
-Here we check that we have divided our services into separate logical pieces.
-
 #### Getting started with ZIO
+
+In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined services that we have to implement.  
 
 Let's begin with the service definition. I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern) to structure the application. 
 Every module will be expressed as a trait. Inside of this trait, we have a service definition, which we will be overridden by the implementation(s).
