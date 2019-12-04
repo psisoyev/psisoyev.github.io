@@ -8,7 +8,7 @@ tags: [Scala, ZIO, htt4ps]
 comments: true
 ---
 
-This post will help you to start building a Scala applications with ZIO.
+This post will help you to start building Scala applications with ZIO.
 
 Today there is lots of libraries in Scala ecosystem, which promise to improve your efficiency. 
 I wrote this post in order to help you to start with the new guy in the neighborhood - [ZIO](https://zio.dev/). 
@@ -16,8 +16,7 @@ It is a huge library that provides you powerful tools to build concurrent applic
 
 This post doesn't cover most of the functionality but will be useful for you to start with something bigger than a 'Hello World' app.
 I will not go into details of specific terms and will provide links for you to do your own research. 
-The intent of the post is to familiarize you with the library on a high level.    
-We will see how to create services with ZIO and how to integrate it with libraries written in Tagless Final style.    
+The intent of the post is to familiarize you with the library on a high level. 
 In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
 
 If you prefer code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
@@ -252,108 +251,6 @@ As we design our services against interfaces we don't care about implementation 
 
 Now we should have some basic understanding of how to build a business logic service with ZIO. 
 
-#### Integrating ZIO with a library written in Tagless Final style
-Let's take a look at another important part of the application. 
-In order to call Telegram API I have chosen [canoe](https://github.com/augustjune/canoe)`.  
-Canoe is one of the Telegram API implementation libraries. It is a pure functional library for building Telegram bots written in Scala using Tagless Final style.  
-Let's take a look at how ZIO can integrate with it.
-
-As it was mentioned before, we want our users to interact with the bot. We have to define the list of commands that the bot will understand:
-
-```text
-/help Shows help menu
-/add  Subscribe to GitHub project releases
-/del  Unsubscribe from GitHub project releases
-/list List current subscriptions
-```
-
-Four simple commands, that bot should understand and react accordingly. 
-Plus `/start` command, which is a default command in Telegram API.  
-I have defined a separate module, where I describe all the possible scenarios.
-Same as with `SubscriptionLogic`, we create a trait, which will represent the module:
-
-```scala
-trait ScenarioLogic[Scenario[F[_], _]] {
-  val scenarios: ScenarioLogic.Service[Scenario]
-}
-```
-
-Nothing new here except the fact I'm not tying `ScenarioLogic` to any specific library. 
-Type argument we pass to `ScenarioLogic` can be read as 
-"some `Scenario` type, that will be evaluated in `F` effect and return some other type, that is not important at this point".
- 
-```scala
-object ScenarioLogic {
-  trait Service[Scenario[F[_], _]] {
-    def start: Scenario[Task, Unit]
-    def help: Scenario[Task, Unit]
-
-    def add: Scenario[Task, Unit]
-    def del: Scenario[Task, Unit]
-    def list: Scenario[Task, Unit]
-  }
-}
-``` 
-
-Above we have defined the list of commands the bot will handle. Let's implement defined scenarios with `canoe`. 
-I will skip some parts of the implementation, but you can find the full version [here](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/client/telegram/ScenarioLogic.scala).
-
-```scala
-import canoe.api.{ TelegramClient => Client, _ }
-import canoe.syntax._
-
-trait CanoeScenarios extends ScenarioLogic[Scenario] {
-    implicit def canoeClient: Client[Task]
-    def subscription: SubscriptionLogic.Service
-    def repositoryValidator: RepositoryValidator.Service
-
-    override val scenarios: Service[Scenario] = new Service[Scenario] {
-      override def add: Scenario[Task, Unit] = ???
-      override def del: Scenario[Task, Unit] = ???
-      override def list: Scenario[Task, Unit] = ???
-      override def start: Scenario[Task, Unit] = ???
-      override def help: Scenario[Task, Unit] = ???
-
-    }
-}
-``` 
-
-Let's go through the code above. 
-We start by extending `ScenarioLogic` module. Here we pass `Scenario` type, which is defined in `canoe` library to describe the interaction between a chat and the bot. 
-There are 3 dependencies defined: implicit `canoe.api.TelegramClient` which is able to execute the scenarios, some implementation of `SubscriptionLogic` and `RepositoryValidator` to check user inputs.  
-
-Now let's see how do we implement the addition of a new repository from user input. Let's go through the for comprehension line by line:
-
-```scala
-for {
-  chat      <- Scenario.start(command("add").chat)
-  _         <- Scenario.eval(chat.send("Please provide repository in form 'organization/name'"))
-  _         <- Scenario.eval(chat.send("Examples: psisoyev/release-pager or zio/zio"))
-  userInput <- Scenario.next(text)
-  _         <- Scenario.eval(chat.send(s"Checking repository '$userInput'"))
-  _         <- Scenario.eval(subscribe(chat, userInput, validate(userInput)))
-} yield ()
-
-private def validate(userInput: String): IO[PagerError, Name] =
-  repositoryValidator.validate(userInput)
-
-private def subscribe(chat: Chat, userInput: String, validated: IO[PagerError, Name]): Task[Unit] =
-  validated.foldM(
-    e => chat.send(s"Couldn't add repository '$userInput': ${e.message}"),
-    name => chat.send(s"Added repository '$userInput'") *> subscription.subscribe(ChatId(chat.id), name)
-  ).unit
-```
-
-The first thing we see is that there are lots of calls on `Scenario` helper object, which members could be imported and the for comprehension would become a bit cleaner. 
-Also, we could implement an implicit conversion from `Task` to `Scenario` using `Scenario.eval`, but let's keep things simple.
-First of all, we retrieve a reference to a chat, which called `/add` command. This reference will be used to send messages later. 
-We send instruction messages to the user and expect some input from him. 
-Then the input is validated by the `RepositoryValidator`. 
-`RepositoryValidator` returns an `IO` type, which is a bifunctor with an error and some type. 
-To handle the result we call `foldM` function, which expects two functions - for success and error cases.  
-In case of success, we notify the user about it and call `SubscriptionLogic` to save the subscription.
-If the validation fails, we notify the user about the wrong issues with the input.
-
 #### Wiring up
 If you read so far, you've seen several service definitions and hopefully, you have a high level picture of what we are doing here.
 At this point, we could go through the rest of the service definition and implementation, but it's not very different from what we've already seen except some small details.
@@ -392,15 +289,15 @@ val program = for {
   subscriberMap   <- Ref.make(Map.empty[Name, Option[Version]])
   subscriptionMap <- Ref.make(Map.empty[ChatId, Set[Name]])
 
-  http4sClient <- buildHttpClient
-  canoeClient  <- buildTelegramClient(token)
+  httpClient <- buildHttpClient
+  telegramClient  <- buildTelegramClient(token)
 
-  _ <- startProgram(subscriberMap, subscriptionMap, http4sClient, canoeClient)
+  _ <- startProgram(subscriberMap, subscriptionMap, httpClient, telegramClient)
 } yield ()
 ```
 
 Here we prepare all the necessary inputs to start the program. As the first step, we retrieve Telegram bot token from environment variables.
-Then we create 2 `Ref` instances holding empty `Map` for `InMemory` repositories. Then we build `Http4s` client and `canoe` client. 
+Then we create 2 `Ref` instances holding empty `Map` for `InMemory` repositories. Then we build `Http` client and `Telegram` client. 
 These values are used to build the dependency tree. 
 
 ZIO gives you the ability to use services, that you don't know how to instantiate or retrieve. 
@@ -427,8 +324,9 @@ The first is needed to call a `scheduleRefresh` function, which will go to GitHu
 Second is needed to repeat the refresh effect every minute. In case of an error repeating will stop.
 
 We combine both effects using the "ice cream" (flatMap) method and now we have one program, which environment is `ReleaseChecker with Clock with TelegramClient`.
-The very last thing is to provide these missing services to the library and we are done. We have to fulfill all the dependency requirements of the services we defined before.
-For example if we want to use `TelegramClient.Canoe` we will have to provide also the `ScenarioLogic.CanoeScenarios` etc.
+The very last thing is to provide these missing services to the library and we are done. 
+We have to fulfill all the dependency requirements of the services we defined before.
+For example, implementation of `ReleaseChecker` depends on `SubscriptionLogic` and the compiler expects it's implementation to be provided.
 
 At the end whole block of dependencies looks like this:
 ```scala
@@ -446,8 +344,8 @@ new TelegramClient.Canoe
     with ReleaseChecker.Live {
       override def subscribers: Ref[SubscriberMap]         = subscriberMap
       override def subscriptions: Ref[SubscriptionMap]     = subscriptionMap
-      override def client: Client[Task]                    = http4sClient
-      override implicit def canoeClient: CanoeClient[Task] = globalCanoeClient
+      override def client: Client[Task]                    = httpClient
+      override implicit def canoeClient: CanoeClient[Task] = telegramClient
     }
 ``` 
 
