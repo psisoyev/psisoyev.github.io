@@ -56,14 +56,16 @@ Sorry for spoilers, you will see how to wire up the dependencies later in this a
 
 In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined logical services that we have to implement. Now we have to implement them.    
 
-To structure the application services I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern). 
+To structure the application services I will use [module pattern](https://zio.dev/docs/howto/howto_use_module_pattern).
+##### If you have visited the module pattern link above, you saw that service definitions have environment type parameter - `Service[R]`. It is useful in testing and will be covered in the next chapter.
 Every module will be expressed as a trait. Inside of this trait, we have a service definition, which we will be overridden by the implementation(s).
 It is recommended to use descriptive names in the service definition to avoid name clashes. 
-We will create instances of the service dependency tree at the very top level in `Main` class and compilator won't allow having name collisions.
-What is good about the module pattern? All the dependencies will be checked at the compile time. 
-And you can have circular dependencies. Is it good? In my opinion - no. 
-Having circular dependencies for me is a clear sign of bad service design which can be solved by separation of concerns. 
+We will create instances of the service dependency tree at the very top level in `Main` class and the compiler won't allow having name collisions.
+All the dependencies will be checked at the compile time. Unfortunately, using module pattern do not guard you against having circular dependencies.  
+Having circular dependencies is a clear sign of bad service design which can be solved by separation of concerns. 
 On the very top level, you select specific implementations of the dependencies. We'll see it later when will go through the `Main` class.
+
+![Service diagram]({{site.baseurl}}/assets/img/design-a-pager/services.png#center)
 
 As you could see in the service diagram the heart of the application is subscription service. 
 It should know how to store user subscriptions, repository versions and also how to retrieve them. 
@@ -74,8 +76,6 @@ trait SubscriptionLogic {
   def subscription: SubscriptionLogic.Service
 }
 ```
-
-##### If you have visited the module pattern link above, you saw that service definitions have environment type parameter - `Service[R]`. It is useful in testing and will be covered in the next chapter.
 
 Here we have defined `SubscriptionLogic` module, which has subscription service definition. 
 In the current version of ZIO docs service definition uses `val` instead of `def`, but I prefer the latter. 
