@@ -16,10 +16,10 @@ It is a huge library that provides you powerful tools to build concurrent applic
 
 This post doesn't cover most of the functionality but will be useful for you to start with something bigger than a 'Hello World' app.
 I will not go into details of specific terms and will provide links for you to do your own research. 
-The intent of the post is to familiarize you with the library on a high level. 
+The intent of this post is to familiarize you with the library on a high level. 
 In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
 
-If you prefer code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
+If you prefer reading code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
 
 ### The problem to solve
 
@@ -48,7 +48,7 @@ ZIO can help you to handle dependency injection in your project. Usually, I don'
 I have all the services initialized in the `Main` class and passed to dependent services via class constructors.   
 With ZIO the approach is a bit similar, but not exactly the same. 
 You instantiate your services in the `Main` class, but you don't need to pass services to each other. 
-That was a spoiler, you will see how to wire up the dependencies later in this article.
+Sorry for spoilers, you will see how to wire up the dependencies later in this article.
 
 Also, ZIO provides you with ZTest - testing framework, which is really handy to test your functional effects. 
 I will share my experience with this framework in the next post.  
