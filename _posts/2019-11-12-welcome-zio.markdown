@@ -50,9 +50,6 @@ With ZIO the approach is a bit similar, but not exactly the same.
 You instantiate your services in the `Main` class, but you don't need to pass services to each other. 
 Sorry for spoilers, you will see how to wire up the dependencies later in this article.
 
-Also, ZIO provides you with ZTest - testing framework, which is really handy to test your functional effects. 
-I will share my experience with this framework in the next post.  
-
 ### The solution
 
 #### Getting started with ZIO
@@ -378,14 +375,18 @@ It depends on what you are trying to build.
 If you are building your own multi-billion startup which won't go live next Tuesday I would go for it. 
 If you are building some general-purpose library, which would not be a part of ZIO ecosystem? Emm, yes. Why I'm not so sure? There are still people who are afraid of 'z' in the library names.  
 Also there are pros and cons to use Tagless Final style for this purpose. Such a comparison deserves a separate article. 
+Of course, you can use ZIO in your Tagless Final services as the effect type.
+
 If your team is not very proficient with trendy functional programming terms like ~~EJB, inheritance~~ "effect", "Tagless Final", it might be challenging. 
-That of course depends on people, project requirements and deadlines. 
+That, of course, depends on people, their ability and will to learn, project requirements and deadlines. 
 Functional programming requires attention, discipline and understanding of the things you do (that applies to any kind of programming, tho).
 However, If you are familiar with Cats Effect, ZIO shouldn't be hard for you. Lots of concepts are similar, but some terminology might differ. 
 With terminology of course I mean not the theory behind all of this, but some implementation methods. 
-ZIO provides a lot of convenience methods, e.g. `foldM` we saw before. Of course, you can use ZIO in your Tagless Final services as the effect type.
+ZIO provides a lot of convenience methods, e.g. `foldM` and `repeat` we saw before. 
+These methods are quite useful and makes your code easier to read and understand. 
+However, you have to get used to them, but I believe it is easier than get used to symbolic aliases.
 
-Handling missing dependencies might be challenging in big dependency trees as error messages provided by the compiler are quite long. 
+It might be challenging to handle missing dependencies in big dependency trees as error messages provided by the compiler are quite long. 
 Instead of having a diff you have the intersection of the expected and actual set of services. Example:
 ```scala
 [error] /Users/psisojevs/projects/release-pager/backend/src/main/scala/io/pager/Main.scala:89:11: type mismatch;
@@ -393,7 +394,7 @@ Instead of having a diff you have the intersection of the expected and actual se
 [error]  required: io.pager.client.telegram.TelegramClient with io.pager.lookup.ReleaseChecker with zio.clock.Clock
 ```
 
-Here, the missing part is `Clock` service. Is it obvious from the first sight? No. Is this something ZIO community can fix? I doubt. 
-Can you fix it your self? Probably, by splitting these services into groups.
+Here, the missing part is `Clock` service and this is not obvious from the first sight. I doubt it can be easily fixed by ZIO community. 
+However, you could reduce amounts of such error messages by grouping your services into smaller dependency trees.
 
-Will I continue using ZIO myself? Sure. I wan't to go further and explore error handling a bit more, unit testing possibilities, streams.
+I will continue exploring ZIO and the next parts of this article series will share my experience with error handling, unit testing possibilities and streams.
