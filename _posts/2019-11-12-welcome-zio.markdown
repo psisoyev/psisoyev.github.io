@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Welcome the new guy - ZIO
+title: On the road to ZIOn
 date: 2019-11-12 13:37:00 +0100
 description: This post will help you to start building Scala applications with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
@@ -11,7 +11,7 @@ comments: true
 This post will help you to start building Scala applications with ZIO.
 
 Today there is lots of libraries in Scala ecosystem, which promise to improve your efficiency. 
-I wrote this post in order to help you to start with the new guy in the neighborhood - [ZIO](https://zio.dev/). 
+I wrote this post in order to help you to start with the new effect type on the block - [ZIO](https://zio.dev/). 
 It is a huge library that provides you powerful tools to build concurrent applications and its own ecosystem.  
 
 This post doesn't cover most of the functionality but will be useful for you to start with something bigger than a 'Hello World' app.
