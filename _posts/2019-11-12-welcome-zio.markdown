@@ -21,7 +21,7 @@ In the next chapters, I would like to cover more specific parts of ZIO ecosystem
 
 If you prefer reading code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
 
-### The problem to solve
+## The problem to solve
 
 ##### At work, we always look for tools that solve our problems and usually we are not looking for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that are not sustainable.  
 
@@ -50,9 +50,9 @@ With ZIO the approach is a bit similar, but not exactly the same.
 You instantiate your services in the `Main` class, but you don't need to pass services to each other. 
 Sorry for spoilers, you will see how to wire up the dependencies later in this article.
 
-### The solution
+## The solution
 
-#### Getting started with ZIO
+### Getting started with ZIO
 
 In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined logical services that we have to implement. Now we have to implement them.    
 
@@ -246,7 +246,7 @@ As we design our services against interfaces we don't care about implementation 
 
 Now we should have some basic understanding of how to build a business logic service with ZIO. 
 
-#### Wiring up
+### Wiring up
 If you read so far, you've seen several service definitions and hopefully, you have a high level picture of what we are doing here.
 At this point, we could go through the rest of the service definition and implementation, but it's not very different from what we've already seen except some small details.
 I think it would be interesting to see how we are starting the application and connect dependent services.
@@ -350,7 +350,7 @@ Instead of own implementations of the logger and GitHub client, I should have us
 At the time of writing, [ZIO-http](https://github.com/zio/zio-http) and [ZIO-logging](https://github.com/zio/zio-logging) are in active development, so I decided not to use them.
 Also, I'm almost sure there is some working GitHub API client Scala wrapper, but for our needs (only checking the last repository version) adding a new dependency is a bit too much.  
 
-### Summary
+## Summary
 I'm happy if you have read until this point.
 This is my very first blog post and I would like to start a blog post series with it. 
 As this is really a high-level introduction to ZIO capabilities this article doesn't focus on specific things, it doesn't compare ZIO with other solutions.
