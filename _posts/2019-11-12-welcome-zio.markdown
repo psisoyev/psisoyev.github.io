@@ -103,8 +103,6 @@ object SubscriptionLogic {
 ``` 
 
 Above you can see the definition of the subscription service interface. 
-##### I'm not calling it an algebra since I'm not abstracting to `F[_]`, but using specific return type. 
-
 Here we have defined several actions that this service can handle.
 All the methods return type is `zio.Task`. This is a type alias to `ZIO[Any, Throwable, A]`.
 
@@ -289,14 +287,14 @@ val program = for {
   subscriberMap   <- Ref.make(Map.empty[Name, Option[Version]])
   subscriptionMap <- Ref.make(Map.empty[ChatId, Set[Name]])
 
-  httpClient <- buildHttpClient
+  httpClient      <- buildHttpClient
   telegramClient  <- buildTelegramClient(token)
 
-  _ <- startProgram(subscriberMap, subscriptionMap, httpClient, telegramClient)
+  _               <- buildProgram(subscriberMap, subscriptionMap, httpClient, telegramClient)
 } yield ()
 ```
 
-Here we prepare all the necessary inputs to start the program. As the first step, we retrieve Telegram bot token from environment variables.
+Here we prepare all the necessary inputs to build the program. As the first step, we retrieve Telegram bot token from environment variables.
 Then we create 2 `Ref` instances holding empty `Map` for `InMemory` repositories. Then we build `Http` client and `Telegram` client. 
 These values are used to build the dependency tree. 
 
@@ -315,7 +313,7 @@ val scheduleReleaseChecker =
 val program                = startTelegramClient *> scheduleReleaseChecker
 ```  
 
-At the first line we start access a `TelegramClient`, that will be provided later, call `start` method on it and fork into a separate `Fiber`. 
+At the first line we access a `TelegramClient`, that will be provided later, call `start` method on it and fork into a separate `Fiber`. 
 As I already mentioned `Fiber` details is out of scope of this article and will be covered in the next chapters. 
 For now, to keep things simple, imagine that we have spawned separate thread for it (it is not exactly correct, but you should get the point).
 
@@ -382,7 +380,7 @@ If you are building some general-purpose library, which would not be a part of Z
 Also there are pros and cons to use Tagless Final style for this purpose. Such a comparison deserves a separate article. 
 If your team is not very proficient with trendy functional programming terms like ~~EJB, inheritance~~ "effect", "Tagless Final", it might be challenging. 
 That of course depends on people, project requirements and deadlines. 
-Functional programming requires attention, discipline and of course understanding of the things you do (that applies to any kind of programming, tho).
+Functional programming requires attention, discipline and understanding of the things you do (that applies to any kind of programming, tho).
 However, If you are familiar with Cats Effect, ZIO shouldn't be hard for you. Lots of concepts are similar, but some terminology might differ. 
 With terminology of course I mean not the theory behind all of this, but some implementation methods. 
 ZIO provides a lot of convenience methods, e.g. `foldM` we saw before. Of course, you can use ZIO in your Tagless Final services as the effect type.
