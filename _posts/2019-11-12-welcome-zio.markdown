@@ -45,8 +45,8 @@ If you are not familiar with this concept I would recommend you watching [this p
 Functional effects make unit testing of side-effects quite easy. This will be covered in detail in one of the upcoming articles. 
 For now, it's important to mention, that ZIO has its own testing framework to test functional effects.
 
-ZIO has tools to build low-level concurrency constructs. The library is built on top of [fibers](https://en.wikipedia.org/wiki/Fiber_(computer_science)). 
-Fibers can be treated as lightweight "green threads". They consume very little amount of memory, have dynamic stacks and are garbage collected when they are not needed anymore.  
+ZIO has tools to build low-level concurrency constructs. The library has its own implementation of [fibers](https://en.wikipedia.org/wiki/Fiber_(computer_science)). 
+Fibers can be treated as lightweight "green threads". They have low memory overhead, dynamic stacks and are garbage collected when they are not needed anymore.  
 There is a set of high-level operations built on top of fibers and it is recommended to use these operations when writing high-level business code. 
 
 The library has resource management features that provide strong guarantees of finalization and clean up. 
