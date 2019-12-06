@@ -15,7 +15,7 @@ I wrote this post in order to help you to start with the new effect type on the 
 It is a huge library that provides you powerful tools to build concurrent applications and its own ecosystem.  
 
 This post doesn't cover all the functionality but will help you get started with something bigger than a 'Hello World' app.
-I will not go into details of specific terms and will provide links for you to do your own research. 
+On certain topics, I will not go into the details, but rather provide links to allow you to do your own research. 
 The intent of this post is to familiarize you with the library on a high level. 
 In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
 
