@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Implement your future with ZIO
-date: 2019-11-12 13:37:00 +0100
+date: 2019-05-12 13:37:00 +0100
 description: This post will help you to start building Scala applications with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
 tags: [Scala, ZIO, http4s]

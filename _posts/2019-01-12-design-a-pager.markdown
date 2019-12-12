@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Designing your first multi-billion startup
-date: 2019-11-12 13:37:00 +0100
+date: 2019-01-12 13:37:00 +0100
 description: This post describes application designing process and code organization
 img: design-a-pager/my-pager.png # Add image post (optional)
 tags: [design, code, modularisation, interface, sbt]
