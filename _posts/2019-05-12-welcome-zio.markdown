@@ -355,7 +355,7 @@ new TelegramClient.Canoe
 ``` 
 
 The list is relatively long for such a small app. This is because we split services into smaller pieces that are easier to manage.  
-You can see the whole `Main` class [here](https://github.com/psisoyev/release-pager/blob/master/backend/src/main/scala/io/pager/Main.scala).
+You can see the whole `Main` class [here](https://github.com/psisoyev/release-pager/blob/part1/backend/src/main/scala/io/pager/Main.scala).
 Instead of own implementations of the logger and HTTP client, we should have used some ready solution. 
 At the time of writing, [ZIO-logging](https://github.com/zio/zio-logging) and [ZIO-http](https://github.com/zio/zio-http) are in early development, so I decided not to use them.
 Also, most probably there is some working GitHub API client Scala wrapper, but for our needs (checking the last repository version) adding a new dependency could be a bit too much.  
