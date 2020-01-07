@@ -409,3 +409,4 @@ Here, the missing part is `Clock` service and this is not obvious from the first
 However, you could reduce amounts of such error messages by grouping your services into smaller dependency trees.
 
 I will continue exploring ZIO and the next parts of this article series will share my experience with error handling, unit testing possibilities and streams.
+Follow me on [Twitter](https://twitter.com/scalamonster) if you would like to be notified about new releases. 
