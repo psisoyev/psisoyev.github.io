@@ -446,7 +446,7 @@ template {
 .highlighter-rouge {
   color: #ce887b;
   font-weight: 400;
-  border: 1px solid #607D8B;
+  border: 1px solid #d8d8d8;
   -webkit-border-radius: 3px;
           border-radius: 3px;
   padding: 0.05rem 0.2rem;
@@ -622,7 +622,7 @@ template {
 
 /* Name.Exception */
 .highlight .nf {
-  color: #c0f;
+  color: #7923c7;
 }
 
 /* Name.Function */
@@ -809,7 +809,7 @@ blockquote {
 }
 
 pre {
-  padding: 1rem 2rem;
+  padding: 0.3rem 1rem;
   overflow: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
