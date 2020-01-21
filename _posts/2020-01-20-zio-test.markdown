@@ -11,7 +11,8 @@ This article will help you to effectively test your "effectful" ZIO code.
 
 In the [previous article](https://scala.monster/welcome-zio/) we were exploring ZIO. 
 We've built the [release pager](https://scala.monster/design-a-pager/) application but we have skipped something very important - unit tests.
-In this article, we will continue to develop the application and we will write tests for it.   
+In this article, we will continue to develop the application and we will write tests for it.
+Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/master/service/src/test/scala/io/pager).    
 
 ZIO has its own ecosystem and provides developer tools to increase development efficiency.
 One of the things which are included in the ZIO toolbox is ZIO Test framework.
@@ -46,7 +47,7 @@ These scenarios will test functionality, that doesn't have dependencies on other
 As you remember we have implemented the [SubscriptionLogic service.](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/subscription/SubscriptionLogic.scala)
 Let's test it!
 
-We create a `LiveSubscriptionLogicSpec.scala` file in `io.pager.subscription` package in `test` folder. 
+We create a `LiveSubscriptionLogicSpec.scala` [file](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/subscription/LiveSubscriptionLogicSpec.scala) in `io.pager.subscription` package in `test` folder. 
 ```scala
 import zio.test._
 import io.pager.subscription.SubscriptionLogicTestCases._
@@ -67,6 +68,8 @@ To create a spec we use `suite` method, which has two parameters - suite name an
 We have extracted both parameters in a singleton object, which we have to import on top of the file.
 We could avoid splitting `LiveSubscriptionLogicSpec` into two objects but it looks cleaner when test scenarios are defined outside of the `DefaultRunnableSpec` class arguments.
 From now we can run our unit tests by clicking `Run` button near the class name in IntelliJ IDEA or using `sbt test` command.
+
+##### Note: After ZIO 1.0 release this split won't be needed anymore as the syntax will look a bit differently. 
 
 We have defined our first spec. Currently it is empty, let's fix that.
 [Last time](https://scala.monster/welcome-zio/) we have implemented `SubscriptionLogic`. 
@@ -105,7 +108,7 @@ The state is used to instantiate storage services, which are used in `Subscripti
 To keep things simple we replace logger with a dummy instance. 
 Ideally, we would like to test log messages as well.
 
-We will be clever and will use property-based tests. For that we have to write data generators:
+We will be clever and will use property-based tests. For that we have to write [data generators](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/Generators.scala):
 ```scala
 import zio.random.Random
 import zio.test.{Gen, Sized}
@@ -164,8 +167,6 @@ You can even compose these assertions together, eg. `isRight(isSome(equalTo(1)))
 Names of the expectations should give us a hint about what they are doing. If you would like to learn more please check the [Scaladoc](https://github.com/zio/zio/blob/master/test/shared/src/main/scala/zio/test/Assertion.scala).
 Provided expectations can be used to build your custom expectations.
 
-##### Note: if you are reading this before the release of ZIO 1.0.0 you will have to use `assert` method with one argument list.
-
 ## The biggest trap I have fallen with ZIO Test.
 This kind of mistakes might happen not only when working with ZIO Test, but with any other effectful code.
 I was used to `ScalaTest` matchers and wrote all the assertions in a column. 
@@ -181,9 +182,9 @@ That's definitely not the behavior we would expect. The correct version would be
 ```scala
   ...
 } yield {
-  assert(repositories)(equalTo(Set(name))) &&
-  assert(subscriptions)(equalTo(Set(name))) &&
-  assert(subscribers)(equalTo(Set(chatId)))
+  assert(repositories, equalTo(Map(name -> None))) &&
+  assert(subscriptions, equalTo(Set(name))) &&
+  assert(subscribers, equalTo(Set(chatId)))
 }
 ```
 The only difference with the original code are the added `&&` (AND) operators. 
@@ -231,7 +232,7 @@ object WithResourceSpecTestCases {
 }
 ```
 Let's have a look at more specific and advanced test examples.
-We have a `ReleaseChecker` service, which has dependencies on other services. 
+We have a `ReleaseChecker` [service](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/lookup/ReleaseChecker.scala), which has dependencies on other services. 
 To be super-efficient we don't want to build the whole dependency tree. 
 We want to test the reaction of `ReleaseChecker` for different inputs.
 In this specific case, the service is gathering some of the inputs from other services.
@@ -322,7 +323,7 @@ trait SubscriptionLogic {
 Aaaand that is it!
 From now on we can use `SubscriptionLogic` mocks in our tests. Let's test the `ReleaseChecker` service, which depends on `SubscriptionLogic`. 
 Also, it has few other dependencies that we have to mark with the `@mockable` annotation. 
-We create a new spec:
+We create a [new spec](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/lookup/LiveReleaseCheckerSpec.scala):
 ```scala
 object LiveReleaseCheckerSpec extends DefaultRunnableSpec(suite(specName)(scenarios: _*))
 
