@@ -42,8 +42,8 @@ As we are planning to run the tests with SBT we have to specify a special test f
 ```scala
 testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
 ```
-Now we are ready to start writing test scenarios. We will start with simple scenarios.
-These scenarios will test functionality, that doesn't have dependencies on other services. 
+Now we are ready to start writing test scenarios. 
+We will start with functionality, that doesn't have dependencies on other services. 
 As you remember we have implemented the [SubscriptionLogic service.](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/subscription/SubscriptionLogic.scala)
 Let's test it!
 
@@ -134,8 +134,8 @@ val scenarios = List(
         subscriptions <- service.listSubscriptions(chatId)
         subscribers   <- service.listSubscribers(name)
       } yield {
-        assert(repositories, equalTo(Map(name -> None)))
-        assert(subscriptions, equalTo(Set(name)))
+        assert(repositories, equalTo(Map(name -> None))) // there might be something missing here
+        assert(subscriptions, equalTo(Set(name)))        // and here ...
         assert(subscribers, equalTo(Set(chatId)))
       }
     }
@@ -161,7 +161,7 @@ checkM(repositoryName, chatIds) { (name, (chatId1, chatId2)) =>
 ```
 The scenario itself is a for comprehension which describes calls to the subscription service and compares expected results with actual.
 To compare the results we use `assert` method which has two parameter lists: the actual value and the expected value.
-If we would need to do the same, but for effectful values, we would call `assertM` method.
+If we would like to do the same for effectful values, we would call `assertM` method.
 ZIO provides different expectations that you can use to build your assertions: `equalTo`, `isLessThen`, `contains`, `isTrue` and many others.
 You can even compose these assertions together, eg. `isRight(isSome(equalTo(1)))`
 Names of the expectations should give us a hint about what they are doing. If you would like to learn more please check the [Scaladoc](https://github.com/zio/zio/blob/master/test/shared/src/main/scala/zio/test/Assertion.scala).
@@ -320,7 +320,7 @@ trait SubscriptionLogic {
   ...
 }
 ```
-Aaaand that is it!
+Aaaand... that's it!
 From now on we can use `SubscriptionLogic` mocks in our tests. Let's test the `ReleaseChecker` service, which depends on `SubscriptionLogic`. 
 Also, it has few other dependencies that we have to mark with the `@mockable` annotation. 
 We create a [new spec](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/lookup/LiveReleaseCheckerSpec.scala):
@@ -365,7 +365,7 @@ Every mock is an `Expectation` that can be converted to `Managed` resource.
 We combine mocks using `&&&` (zip), map over them and build the service. 
 The service is also a resource now. We can `use` it and call `scheduleRefresh` method. 
 As the method doesn't return us anything we say that we expect the test to be successful every time (`assertCompletes`).
-By the way, `as` is just a `map` alias, which drops the result of the previous effect.
+By the way - `as` is just a `map` alias, that drops the result of the previous effect.
 
 Finally, let's implement a test scenario with mocked services. 
 Below you can see one of the test scenarios.
@@ -406,9 +406,9 @@ val subscriptionLogicMocks =
 ```
 Here we have several calls of the service.
 As it was mentioned, a method call on a ZIO mock is an `Expectation`. 
-This means if the expected method wasn't called, the framework will return us an error that will fail the test. 
+This means, that if the expected method wasn't called, the framework will return us an error that will fail the test. 
 Also, a test will fail if we have called a method with unexpected arguments. 
-Basically, the framework gives us the possibility to set strict expectations and tests will fail if at least one of the expectations is not met. 
+Basically, the framework gives us the possibility to set strict expectations and tests will fail when something unexpected happens. 
 As we have several expectations of the mock we must chain these expectations using `flatMap` or the "ice-cream operator" `*>`.
 Note, that expectations are not associative. This means that we must keep the correct mocked method call order.
 
@@ -475,6 +475,7 @@ In this article we have explored ZIO Test and its capabilities:
 * we removed all the boilerplate required for service mocking using macros
 * we saw what issues we can expect from using macros and how to handle them
 * we added test features using aspects
+
 That's a lot! The best part of this is that there are more things that you can explore by yourself: 
 resource management (we saw just a little example), ScalaJS support, etc. 
 
