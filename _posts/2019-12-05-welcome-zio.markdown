@@ -19,6 +19,10 @@ On certain topics, I will not go into the details, but rather provide links to a
 The intent of this post is to familiarize you with the library on a high level. 
 In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
 
+Please note that we will be using ZIO version `1.0.0-RC17`. 
+We should expect to see ZIO API changes in the next release candidate (which will be the last before the official release). 
+This article will be updated accordingly when the new version will be available.
+
 If you prefer reading code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
 
 ## The problem to solve
