@@ -404,7 +404,12 @@ Of course, you can use ZIO in your Tagless Final services as the effect type.
 If your team is not very proficient with trendy functional programming terms like ~~EJB, inheritance~~ "effect", "Tagless Final", it might be challenging. 
 That, of course, depends on people, their ability and will to learn, project requirements and deadlines.
 However, for me it feels that getting started with ZIO might be quite an easy thing to do.
-To start writing some ZIO code you do not have to be proficient with category theory, for example. 
+To start writing some ZIO code you do not have to be proficient with category theory, for example.
+
+Using this kind of "God monad" is dangerous. 
+If you won't understand how the framework works you might end up in catching weird bugs. Which won't be bugs in a fact.
+With ZIO it is easy to write code that will work somehow magically, but I think that in longterm it is important to understand how it is working.
+Of course, that applies to any new technology.
 
 In general, functional programming requires attention, discipline and understanding of the things you do (that applies to any kind of programming, though).
 If you are familiar with Cats Effect, ZIO shouldn't be hard for you. 
