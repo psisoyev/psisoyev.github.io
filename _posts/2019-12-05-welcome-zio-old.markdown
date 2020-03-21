@@ -21,9 +21,9 @@ In the next chapters, I would like to cover more specific parts of ZIO ecosystem
 
 Please note that we will be using ZIO version `1.0.0-RC17`. 
 We should expect to see ZIO API changes in the next release candidate (which will be the last before the official release). 
-This article will be updated accordingly when the new version will be available.
+If you would like to read an article based on version `1.0.0-RC18` - [click here](https://scala.monster/welcome-zio/).
 
-If you prefer reading code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
+If you prefer reading code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager/tree/chapter1). 
 
 ## The problem to solve
 
@@ -60,7 +60,7 @@ It is similar to `try/catch` block but expressed as a functional effect.
 Also, there is its own implementation of the streaming model. Unfortunately, I haven't looked closely into it yet. 
 
 ZIO can help you to handle dependency injection in your project. Usually, I don't use any dependency injection frameworks in Scala. 
-Here we will have all the services initialized in the `Main` class and passed to dependent services via class constructors.   
+Here we will have all the services initialized in the `Main` class and passed to dependent services via class constructors. 
 With ZIO the approach is a bit similar, but not exactly the same. 
 You instantiate your services in the `Main` class, but you don't need to pass services to each other. 
 Sorry for spoilers, you will see how to wire up the dependencies later in this article.
@@ -149,7 +149,7 @@ trait Live extends SubscriptionLogic {
   ... // skipped the rest
 ``` 
 
-Lets skip the whole implementation in this snippet, you should get the idea. You can find the full implementation on [GitHub](https://github.com/psisoyev/release-pager). 
+Lets skip the whole implementation in this snippet, you should get the idea. You can find the full implementation on [GitHub](https://github.com/psisoyev/release-pager/tree/chapter1). 
 This `SubscriptionLogic` implementation has three dependencies: a logger, chat storage and repository version storage.
 Other implementation of this logic might have a totally different set of dependencies or even have no dependencies at all.
 We will skip Logger because actually, we shouldn't write our own logger or with other words re-invent a bicycle and just use some ready-to-use library.
@@ -359,7 +359,7 @@ new TelegramClient.Canoe
 ``` 
 
 The list is relatively long for such a small app. This is because we split services into smaller pieces that are easier to manage.  
-You can see the whole `Main` class [here](https://github.com/psisoyev/release-pager/blob/part1/backend/src/main/scala/io/pager/Main.scala).
+You can see the whole `Main` class [here](https://github.com/psisoyev/release-pager/blob/chapter1/backend/src/main/scala/io/pager/Main.scala).
 Instead of own implementations of the logger and HTTP client, we should have used some ready solution. 
 At the time of writing, [ZIO-logging](https://github.com/zio/zio-logging) and [ZIO-http](https://github.com/zio/zio-http) are in early development, so I decided not to use them.
 Also, most probably there is some working GitHub API client Scala wrapper, but for our needs (checking the last repository version) adding a new dependency could be a bit too much.  
