@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Implement your future with ZIO
+title: Implement your future with ZIO [RC17 edition]
 date: 2019-12-05 13:37:00 +0100
 description: This post will help you to start building Scala applications with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)

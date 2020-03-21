@@ -414,6 +414,11 @@ ZIO provides a lot of convenience methods, e.g. `fork` and `repeat` we saw befor
 These methods are quite useful and make your code easier to read and reduces amounts of boilerplate. 
 However, you have to get used to them. 
 Getting used to symbolic aliases is a bit more challenging. Even though symbolic aliases are not mandatory and you can live without using them.
+Code of the library is well organised and it is easy to navigate through the files. Also, it has a lot of ScalaDocs.
+
+It is always easy to get some help in [ZIO discord chat](https://discord.gg/2ccFBr4). 
+Community is already quite big and it is rapidly growing. 
+With that there are many side projects around ZIO including its own implementation of a [actors](https://github.com/zio/zio-actors), [Redis client](https://github.com/zio/zio-redis), [Kafka client](https://github.com/zio/zio-kafka) etc. 
 
 I will continue exploring ZIO and in the next article I will share my experience with unit testing possibilities in ZIO.
 Follow me on [Twitter](https://twitter.com/scalamonster) if you would like to be notified about a new article.
