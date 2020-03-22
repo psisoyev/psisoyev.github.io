@@ -8,32 +8,33 @@ tags: [Scala, ZIO, ZLayer, http4s]
 comments: true
 ---
 
-This post will help you to start building Scala applications with ZIO.
+This post will help you start building Scala applications with ZIO.
 
-Today there are lots of libraries in Scala ecosystem, which promise to improve your efficiency. 
+Today there are a lot of libraries in Scala ecosystem, that promise to improve your efficiency. 
 I wrote this post in order to help you to start with the new effect type on the block - [ZIO](https://zio.dev/). 
-It is a huge library that provides you powerful tools to build concurrent applications and its own ecosystem.  
+It's a huge library that gives you powerful tools to build concurrent applications and its own ecosystem.  
 
 This post doesn't cover all the functionality but will help you get started with something bigger than a 'Hello World' app.
-On certain topics, I will not go into the details, but rather provide links to allow you to do your own research. 
+On certain topics I will not go into details, but rather provide links to allow you to do your own research. 
 The intent of this post is to familiarize you with the library on a high level. 
-In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
+In the next chapters I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
 
 Please note that we will be using ZIO version `1.0.0-RC18-2`. 
 We should not expect to see ZIO API changes in the next release candidates before the official release of version 1.0. 
-If for some reason you are interested in ZIO version `1.0.0-RC17` you are welcomed to read [first edition of this post](https://scala.monster/welcome-zio-old/).
+If for some reason you are interested in ZIO version `1.0.0-RC17` you are welcome to read [first edition of this post](https://scala.monster/welcome-zio-old/).
 
-If you prefer reading code rather than text you are welcome to check the [project page](https://github.com/psisoyev/release-pager). 
+If you prefer reading code rather than text you please check the [project page](https://github.com/psisoyev/release-pager). 
 
 ## The problem to solve
 
-##### We look for tools that solve our problems and we should not look for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that is not sustainable.  
+##### We look for tools that solve our problems, not problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that is not sustainable.  
 
 In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined a problem that needs to be solved. 
 If you haven't read it yet, I would recommend checking it before you proceed with this one.
  
-Scala ecosystem is diverse and can provide you with various different approaches and techniques that can solve the very same business problem. There are different approaches and frameworks to build applications. 
-ZIO is one of the newest libraries in the ecosystem and is advertised as a library, that can simplify software development with Scala, which would make its users more efficient.
+Scala ecosystem is diverse and can provide you with various different approaches and techniques that can solve the very same business problem. 
+There are different frameworks and approaches to build applications. 
+ZIO is one of the newest libraries in the ecosystem and is advertised that it can simplify software development with Scala, which would make its users more efficient.
 As I like to explore the world of functional programming I decided to try it out and share my experience with you.  
 
 According to [documentation](https://zio.dev/docs/overview/overview_index) ZIO is a library for asynchronous and concurrent programming that promotes pure functional programming.
@@ -42,9 +43,9 @@ If functional programming is something you like or you feel interested in it, th
 Let's take a look at what ZIO is about.
 ZIO allows you to build your programs in a "lazy" fashion. You describe how your program should behave in [pure functions](https://en.wikipedia.org/wiki/Pure_function).
 These functions return data structures that are called functional effects. In short, a functional effect is an immutable value that describes tasks that should be done. 
-When we create such an effect we have to run it manually. This means that all side-effects inside of the functional effect will be called only when we run it. 
+When we create such an effect we have to run it manually. This means that all side-effects inside of it will be evaluated only after interpreting. 
 You combine these effects into a program, which you run only once, on the very top level. 
-If you are not familiar with this concept I would recommend you watching [this presentation](https://youtu.be/30q6BkBv5MY).
+If you are not familiar with this concept I would recommend you to watch [this presentation](https://youtu.be/30q6BkBv5MY).
  
 Functional effects make unit testing of side-effects quite easy. This will be covered in detail in the next article. 
 For now, it's important to mention, that ZIO has its own testing framework to test functional effects.
@@ -66,8 +67,8 @@ Some of them are in the development phase and if you ever wanted to participate 
 
 ### Getting started with ZIO
 
-If you already have heard about ZIO you know that the core of it is a data type which describes an effect.
-A value of this data type doesn't do anything itself. It is just a description of something that should be done.
+If you already have heard about ZIO you know that at its core lays a data type which describes an effect.
+A value of this type doesn't do anything itself. It is just a description of something that should be done.
 ZIO runtime system is responsible for actually doing what is described or simply - interpreting. 
 Usually it is done only once in our `run` function in `Main` class. 
 `ZIO[-R, +E, +A]` data type has 3 type parameters:
@@ -77,8 +78,8 @@ Usually it is done only once in our `run` function in `Main` class.
 
 You can see it as "E or A can be produced when R is provided". 
 If we would speak functions that would be `R => Either[E, A]`. 
-If you want to learn more about the data type refer to the [official documentation](https://zio.dev/docs/datatypes/datatypes_io). 
-Now let's see how can we use this data type in service implementation.
+If you want to learn more about IO monad refer to the [official documentation](https://zio.dev/docs/datatypes/datatypes_io). 
+Now let's see how can we use it in service implementation.
 
 In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined logical services. It is time to implement them.    
 
@@ -125,11 +126,11 @@ Above you can see the definition of the subscription service interface.
 Here we have defined several actions that this service can handle.
 Methods return us `zio.Task` type. This is a type alias to `ZIO[Any, Throwable, A]`. 
 In this case, the environment type is not used, but there might be an exception thrown by the DB layer (eg. lost DB connection).
-Usually, we would catch expected errors and wrap them into a typed error. Here to keep things simple lets use `Throwable`.
+Usually, we would catch expected errors and wrap them into a typed error. Here, to keep things simple, lets use `Throwable`.
 
 To implement the logic we have to create a class which extends `SubscriptionLogic` trait. 
 There are two ways to organize your implementations: either put all implementations inside of the module or create a separate file in the same package.
-The difference is that if you will have a service with several implementations it won't be convenient to navigate in several thousands of lines of code in one file.
+The difference is, that if you will have a service with several implementations, it won't be convenient to navigate in several thousands of lines of code in one file.
 Let's create our first implementation of a module:
 
 ```scala
@@ -150,10 +151,12 @@ private[subscription] final case class Live(
   ... // skipped the rest
 ``` 
 
-Lets skip the rest of the implementation in this snippet, you should get the idea. You can find the full implementation on [GitHub](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/subscription/Live.scala). 
-This `SubscriptionLogic` implementation has three dependencies: a logger, chat storage and repository version storage.
+Lets skip the rest of the implementation in this snippet, you should get the idea. 
+You can find the full version of it on [GitHub](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/subscription/Live.scala). 
+`Live` has three dependencies: a logger, chat storage and repository version storage.
 Other implementation of this logic might have a totally different set of dependencies or even have no dependencies at all.
-Here we see that it is just a class, that accepts some services as constructor arguments. Shouldn't be new for us.
+Here we see that it is just a class, that accepts some services as constructor arguments. 
+It shouldn’t be anything new for us.
 
 In the code above we see the implementation of two functions, which log user action and call chat storage.
 For those, who find function aliases unreadable or not familiar with them, `*>` or as I call it "ice cream", is just an alias to `flatMap` function, which drops the result of the previous computation.   
@@ -220,7 +223,7 @@ private[chat] final case class InMemory(subscriptions: Ref[SubscriptionMap]) ext
 }
 ``` 
 
-In this relatively small code snippet, a lot of stuff is happening. 
+A lot is happening in this small code snippet. 
 As you might have noticed, the return type of all the methods is not `Task` as in the interface, but `UIO`.
 `UIO` is used when you are sure that all the operations are pure and nothing can break. 
 Basically, that there are no errors expected (or even possible). 
@@ -251,7 +254,7 @@ private[chat] final case class Doobie(xa: Transactor[Task]) extends Service {
 [Actual implementation](https://github.com/psisoyev/release-pager/blob/master/storage/src/main/scala/io/pager/subscription/chat/Doobie.scala) is not important at this point, but you can see that now there is a different set of dependencies comparing to `InMemory` implementation. 
 We don't need to have `Ref` as we will store the data in a database. The only dependency for this implementation is `doobie.util.transactor.Transactor`. 
 
-Now, if we want to replace `InMemory` implementation with `Doobie` implementation we have to do changes only in one place - the `Main` class where all the services are wired together. 
+Now, if we want to replace `InMemory` implementation with `Doobie` implementation we have to change only one place - the `Main` class where all the services are wired together. 
 As we design our services against interfaces we don't care about implementation details of the dependee, so `SubscriptionLogic` implementations won't be affected by the change. 
 
 Now we should have some basic understanding of how to build a business logic service with ZIO. 
@@ -262,7 +265,7 @@ At this point, we could go through the rest of the service definition and implem
 It would be interesting to see how we are starting the application and connect dependent services.
 
 As we are building the application from scratch we will extend our `Main` object with `zio.App`.
-Overriding the `App` forces also to override `run` method:
+Overriding the `App` forces us to override `run` method:
 
 ```scala
 override def run(args: List[String]): ZIO[ZEnv, Nothing, Int]
@@ -297,7 +300,7 @@ Here we prepare all the necessary inputs to build the program. As the first step
 Then we create `Http` and `Telegram` clients. After that we wire all services together in `makeProgram` method.
 
 ZIO gives you the ability to describe method calls on a service without having an instance of the service. 
-This is where `R` type parameter in ZIO data type comes handy.
+This is where `R` type parameter in ZIO data type comes in handy.
 We can see it as taking a service in debt. Of course, we must then return the debt.
 How that works?
 Let's take a look at the program itself:
@@ -324,14 +327,14 @@ We call a `scheduleRefresh` method, which will call GitHub API and will check fo
 To repeat the refresh effect every minute we call `repeat` method on ZIO data type. 
 If at some point of time `scheduleRefresh` will fail with an error, repeating of the effect will stop.
 
-We combine both effects using the "ice cream" (flatMap) method and now we have one program, which environment is `Clock with ReleaseChecker with TelegramClient`.
+We combine both effects using the "ice cream" (flatMap) method and now we have one program, with environment `Clock with ReleaseChecker with TelegramClient`.
 `Clock` appears as a required service because we are using `repeat` method.
 The very last thing is to provide these missing services to the library and we are done. 
 We have to fulfill all the dependency requirements of the services we defined before.
 For example, `Live` implementation of `ReleaseChecker` depends on `SubscriptionLogic` and the compiler expects this service to be provided.
 
-It is possible that same method could be called using `accessM` in different parts of the application. 
-To avoid spread of boilerplate across the application we can create a convenience methods inside of a service module:
+It is possible that the same method could be called using `accessM` in different parts of the application. 
+To avoid spreading of boilerplate across the application we can create a convenience methods inside of a service module:
 ```scala
 object ReleaseChecker {
     ... // skipped the rest
@@ -359,7 +362,7 @@ Inside of this function we create an instance of the service.
 Another way of building a ZLayer is using an effect or a managed resource. 
 When using these it is more likely that one of them can fail.
 When we are building an `inMemory` storage we have to provide a `Map` inside of a `Ref`. 
-Creation of a ref is effect. To create a layer for it we will use `fromEffect` method: 
+Creation of a ref is an effect. To create a layer for it we will use `fromEffect` method: 
 ```scala
 val versionMap = ZLayer.fromEffect(Ref.make(Map.empty[Name, Option[Version]]))
 val subscriptionMap = ZLayer.fromEffect(Ref.make(Map.empty[ChatId, Set[Name]]))
@@ -377,14 +380,13 @@ However, they are pretty intuitive.
 `++` will combine layers horizontally and `>>>` vertically. 
 Let's have a look at what we are doing above and you will get it.
 
-To create `chatStorage` layer we provide `versionMap` layer to `ChatStorage.inMemory` layer recipe using vertical composition.
+To create `chatStorage` layer we provide `versionMap` to (`>>>`) `ChatStorage.inMemory` recipe using vertical composition.
 This means that vertical composition takes output of one layer and puts it into input of another one.
-Or simply, we provide `subscriptionMap` layer to (`>>>`) `chatStorage` layer.
 
 When we have both storage layers created we can combine them horizontally with `++` to create `storage` layer.
 This means that horizontal composition combines layer outputs.
 
-We combine `storage` layer with `logger` layer horizontally and provide it to `SubscriptionLogic.live` layer.
+We combine `storage` with `logger` horizontally and provide it to `SubscriptionLogic.live` layer.
 That is it. 
 Now we have `subscriptionLogic` which is of type `ZLayer[Clock with Console, Nothing, Has[SubscriptionLogic.Service]]`. 
 Let's take a closer look on the type parameters of the layer:
@@ -403,11 +405,10 @@ We have seen how to design and implement several services. We have seen how to b
 Also, we've used ZIO environment and ZLayer to create service instances and start our program. 
 Without noticing we were actively using Fibers, which is the smallest concurrency element in ZIO.
 
-After becoming familiar with module pattern and few concepts its becoming easy to reason about the code.
-The code looks nice and clean. 
+After becoming familiar with module pattern and few concepts it is becoming easy to reason about the code.
+It looks nice and clean. 
 
-Would I recommend ZIO? It depends.
-It depends on what you are trying to build. 
+Would I recommend ZIO? It depends on what you are trying to build. 
 If you want to learn something new or want to be aware of the trends in Scala world - try it without any doubts. 
 If you are building your own multi-billion startup which won't go live next Tuesday I might go for it. 
 If you are building a general-purpose library, which would not be a part of ZIO ecosystem? Emm, could be. Why I'm not so sure? 
@@ -422,23 +423,23 @@ However, for me it feels that getting started with ZIO might be quite an easy th
 To start writing some ZIO code you do not have to be proficient with category theory terminology, for example.
 
 Using this kind of "God monad" is dangerous. 
-If you won't understand how the framework works you might end up catching weird bugs. Which won't be bugs but misuse of features.
+If you won't understand how the framework works you might end up catching weird bugs which won't be bugs but misuse of features.
 With ZIO it is easy to write code that will work somehow magically, but I think that in longterm it is important to understand how it is working.
 Of course, that applies to any new technology.
 
-In general, functional programming requires attention, discipline and understanding of the things you do (that applies to any kind of programming, though).
-If you are familiar with Cats Effect, ZIO shouldn't be hard for you. 
+In general, functional programming requires attention, discipline and understanding of the things you do (that applies to any kind of programming).
+If you are familiar with Cats Effect, then ZIO shouldn't be hard for you. 
 Some concepts and techniques are similar, just some names might differ.
 
-ZIO provides a lot of convenience methods, e.g. `fork` and `repeat` we saw before. 
-These methods are quite useful and make your code easier to read and reduces amounts of boilerplate. 
+ZIO provides a lot of convenience methods, e.g. `fork` and `repeat` that we saw before. 
+These methods are quite useful and make your code easier to read and reduce amounts of boilerplate. 
 However, you have to get used to them. 
-Getting used to symbolic aliases is a bit more challenging. Even though symbolic aliases are not mandatory and you can code without them.
+With symbolic aliases it is a bit more challenging. Even though using them is not mandatory and you can code without them.
 Code of the library is well organised and it is easy to navigate through its files. Also, it has a lot of ScalaDocs.
 
 It is always easy to get some help in [ZIO discord chat](https://discord.gg/2ccFBr4). 
 Community is already quite big and it is rapidly growing. 
-With that there are many side projects around ZIO including its own implementation of a [actors](https://github.com/zio/zio-actors), [Redis client](https://github.com/zio/zio-redis), [Kafka client](https://github.com/zio/zio-kafka) etc. 
+There are many side projects around ZIO including its own implementation of [actors](https://github.com/zio/zio-actors), [Redis client](https://github.com/zio/zio-redis), [Kafka client](https://github.com/zio/zio-kafka) etc. 
 
 I will continue exploring ZIO and in the next article I will share my experience with unit testing possibilities in ZIO.
 Follow me on [Twitter](https://twitter.com/scalamonster) if you would like to be notified about a new article.
