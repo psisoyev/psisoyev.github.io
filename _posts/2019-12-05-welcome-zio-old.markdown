@@ -27,7 +27,7 @@ If you prefer reading code rather than text you are welcome to check the [projec
 
 ## The problem to solve
 
-##### We look for tools that solve our problems and we should not look for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that are not sustainable.  
+##### We look for tools that solve our problems and we should not look for problems to solve with our beloved tools. Otherwise, we end up with a zoo of different technologies that is not sustainable.  
 
 In [the previous article]({{site.baseurl}}/design-a-pager/) we have defined a problem that needs to be solved. 
 If you haven't read it yet, I would recommend checking it before you proceed with this one.
@@ -41,8 +41,8 @@ If functional programming is something you like or you feel interested in it, th
 
 Let's take a look at what ZIO is about.
 ZIO allows you to build your programs in a "lazy" fashion. You describe how your program should behave in [pure functions](https://en.wikipedia.org/wiki/Pure_function).
-These functions return data structures that are called functional effects. In short, the functional effect is an immutable value that describes tasks that should be done. 
-When we create such an effect we have to run it manually. This means that all the side-effects inside of the functional effect will be called only when we run it. 
+These functions return data structures that are called functional effects. In short, a functional effect is an immutable value that describes tasks that should be done. 
+When we create such an effect we have to run it manually. This means that all side-effects inside of the functional effect will be called only when we run it. 
 You combine these effects into a program, which you run only once, on the very top level. 
 If you are not familiar with this concept I would recommend you watching [this presentation](https://youtu.be/30q6BkBv5MY).
  
