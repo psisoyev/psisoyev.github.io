@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Implement your future with ZIO [RC18 edition]
+title: From idea to production with ZLayer
 date: 2020-03-21 13:37:00 +0100
 description: This post will help you to start building Scala applications with ZIO
 img: welcome-zio/my-pager.png # Add image post (optional)
