@@ -10,7 +10,7 @@ comments: true
 
 This post will help you start building Scala applications with ZIO.
 
-Today there are a lot of libraries in Scala ecosystem, that promise to improve your efficiency. 
+Today there are many libraries in Scala ecosystem, that promise to improve your efficiency. 
 I wrote this post in order to help you to start with the new effect type on the block - [ZIO](https://zio.dev/). 
 It's a huge library that gives you powerful tools to build concurrent applications and its own ecosystem.  
 
