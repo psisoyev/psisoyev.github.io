@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Effective testing with ZIO Test
+title: Effective testing with ZIO Test [RC17 edition]
 date: 2020-01-20 13:37:00 +0100
 description: Effectful testing with ZIO Test
 img: test/test.png
@@ -12,10 +12,10 @@ This article will help you to effectively test your "effectful" ZIO code.
 In the [previous article](https://scala.monster/welcome-zio/) we were exploring ZIO. 
 We've built the [release pager](https://scala.monster/design-a-pager/) application but we have skipped something very important - unit tests.
 In this article, we will continue to develop the application and we will write tests for it.
-Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/master/service/src/test/scala/io/pager).    
+Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/chapter1/service/src/test/scala/io/pager).    
 Please note that we will be using ZIO version `1.0.0-RC17`. 
 We should expect to see ZIO Test API changes in the next release candidate (which will be the last before the official release). 
-This article will be updated accordingly when the new version will be available. 
+If you would like to read an article based on version `1.0.0-RC18` - [click here](https://scala.monster/zio-test/). 
 
 ZIO has its own ecosystem and provides developer tools to increase development efficiency.
 One of the things which are included in the ZIO toolbox is ZIO Test framework.
@@ -36,21 +36,21 @@ Instead, let's focus on:
 * "What are additional capabilities ZIO Test can provide?"
 
 ## Getting started with ZIO Test 
-We start with adding test dependencies in [Dependencies.scala](https://github.com/psisoyev/release-pager/blob/master/project/Dependencies.scala):
+We start with adding test dependencies in [Dependencies.scala](https://github.com/psisoyev/release-pager/blob/chapter1/project/Dependencies.scala):
 ```scala
 val zioTest    = "dev.zio" %% "zio-test"     % Version.zio % "test"
 val zioTestSbt = "dev.zio" %% "zio-test-sbt" % Version.zio % "test"
 ``` 
-As we are planning to run the tests with SBT we have to specify a special test framework in SBT [Settings.scala](https://github.com/psisoyev/release-pager/blob/master/project/Settings.scala#L28):
+As we are planning to run the tests with SBT we have to specify a special test framework in SBT [Settings.scala](https://github.com/psisoyev/release-pager/blob/chapter1/project/Settings.scala#L28):
 ```scala
 testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
 ```
 Now we are ready to start writing test scenarios. 
 We will start with functionality, that doesn't have dependencies on other services. 
-As you remember we have implemented the [SubscriptionLogic service.](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/subscription/SubscriptionLogic.scala)
+As you remember we have implemented the [SubscriptionLogic service.](https://github.com/psisoyev/release-pager/blob/chapter1/service/src/main/scala/io/pager/subscription/SubscriptionLogic.scala)
 Let's test it!
 
-We create a `LiveSubscriptionLogicSpec.scala` [file](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/subscription/LiveSubscriptionLogicSpec.scala) in `io.pager.subscription` package in `test` folder. 
+We create a `LiveSubscriptionLogicSpec.scala` [file](https://github.com/psisoyev/release-pager/blob/chapter1/service/src/test/scala/io/pager/subscription/LiveSubscriptionLogicSpec.scala) in `io.pager.subscription` package in `test` folder. 
 ```scala
 import zio.test._
 import io.pager.subscription.SubscriptionLogicTestCases._
@@ -111,7 +111,7 @@ The state is used to instantiate storage services, which are used in `Subscripti
 To keep things simple we replace logger with a dummy instance. 
 Ideally, we would like to test log messages as well.
 
-We will be clever and will use property-based tests. For that we have to write [data generators](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/Generators.scala):
+We will be clever and will use property-based tests. For that we have to write [data generators](https://github.com/psisoyev/release-pager/blob/chapter1/service/src/test/scala/io/pager/Generators.scala):
 ```scala
 import zio.random.Random
 import zio.test.{Gen, Sized}
@@ -235,7 +235,7 @@ object WithResourceSpecTestCases {
 }
 ```
 Let's have a look at more specific and advanced test examples.
-We have a `ReleaseChecker` [service](https://github.com/psisoyev/release-pager/blob/master/service/src/main/scala/io/pager/lookup/ReleaseChecker.scala), which has dependencies on other services. 
+We have a `ReleaseChecker` [service](https://github.com/psisoyev/release-pager/blob/chapter1/service/src/main/scala/io/pager/lookup/ReleaseChecker.scala), which has dependencies on other services. 
 To be super-efficient we don't want to build the whole dependency tree. 
 We want to test the reaction of `ReleaseChecker` for different inputs.
 In this specific case, the service is gathering some of the inputs from other services.
@@ -326,7 +326,7 @@ trait SubscriptionLogic {
 Aaaand... that's it!
 From now on we can use `SubscriptionLogic` mocks in our tests. Let's test the `ReleaseChecker` service, which depends on `SubscriptionLogic`. 
 Also, it has few other dependencies that we have to mark with the `@mockable` annotation. 
-We create a [new spec](https://github.com/psisoyev/release-pager/blob/master/service/src/test/scala/io/pager/lookup/LiveReleaseCheckerSpec.scala):
+We create a [new spec](https://github.com/psisoyev/release-pager/blob/chapter1/service/src/test/scala/io/pager/lookup/LiveReleaseCheckerSpec.scala):
 ```scala
 object LiveReleaseCheckerSpec extends DefaultRunnableSpec(suite(specName)(scenarios: _*))
 

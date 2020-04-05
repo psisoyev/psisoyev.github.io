@@ -47,7 +47,7 @@ When we create such an effect we have to run it manually. This means that all si
 You combine these effects into a program, which you run only once, on the very top level. 
 If you are not familiar with this concept I would recommend you to watch [this presentation](https://youtu.be/30q6BkBv5MY).
  
-Functional effects make unit testing of side-effects quite easy. This will be covered in detail in the next article. 
+Functional effects make unit testing of side-effects quite easy. This is covered in detail in [the next article](https://scala.monster/zio-test/). 
 For now, it's important to mention, that ZIO has its own testing framework to test functional effects.
 
 ZIO has tools to build low-level concurrency constructs. The library has its own implementation of [fibers](https://en.wikipedia.org/wiki/Fiber_(computer_science)). 
