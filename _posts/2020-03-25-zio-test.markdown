@@ -14,7 +14,7 @@ We've built the [release pager](https://scala.monster/design-a-pager/) applicati
 In this article, we will continue to develop the application. We will write unit tests for it.
 Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/master/service/src/test/scala/io/pager).
 
-Please note that we will be using ZIO version `1.0.0-RC18-2`.
+Please note that we will be using nightly build of ZIO.
 We should not expect to see ZIO API changes in the next release candidates before the official release of version 1.0.
 This article will be updated accordingly when the new version will be available. 
 If for some reason you are interested in ZIO version `1.0.0-RC17` you are welcome to read [first edition of this post](https://scala.monster/zio-test-old/).
