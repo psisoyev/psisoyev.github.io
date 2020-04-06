@@ -3,7 +3,7 @@ layout: post
 title: Effective testing with ZIO Test
 date: 2020-04-05 13:37:00 +0100
 description: Effectful testing with ZIO Test
-img: test/test.png
+img: test/test2.png
 tags: [Scala, ZIO, ZTest, unit testing, rc18]
 comments: true
 ---
