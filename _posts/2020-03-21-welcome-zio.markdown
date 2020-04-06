@@ -4,7 +4,7 @@ title: From idea to product with ZLayer
 date: 2020-03-21 13:37:00 +0100
 description: This post will help you to start building Scala applications with ZIO
 img: welcome-zio/welcome-zio.png # Add image post (optional)
-tags: [Scala, ZIO, ZLayer, http4s]
+tags: [Scala, ZIO, ZLayer, http4s, rc18]
 comments: true
 ---
 

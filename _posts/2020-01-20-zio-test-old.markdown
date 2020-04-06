@@ -4,7 +4,7 @@ title: Effective testing with ZIO Test [RC17 edition]
 date: 2020-01-20 13:37:00 +0100
 description: Effectful testing with ZIO Test
 img: test/test.png
-tags: [Scala, ZIO, ZTest, unit testing]
+tags: [Scala, ZIO, ZTest, unit testing, rc17]
 comments: true
 ---
 This article will help you to effectively test your "effectful" ZIO code.
