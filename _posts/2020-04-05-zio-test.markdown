@@ -158,6 +158,8 @@ It sounds like a lot of boilerplate.
 If you want to be super efficient and want to save a bit of your precious time you can use macros.
 For that we mark our module with `@accessible` annotation:
 ```scala
+import zio.macros.accessible
+
 @accessible
 object SubscriptionLogic {
 ```
@@ -315,6 +317,8 @@ Another annotation, that we can use to simplify our life is `@mockable`.
 
 To get rid of the boilerplate using `@mockable` for a service we should follow the [module pattern](https://zio.dev/docs/howto/howto_use_layers) and mark the mock definition with the annotation:
 ```scala
+import zio.test.mock.mockable
+
 @mockable[SubscriptionLogic.Service]
 object SubscriptionLogicMock
 ```
