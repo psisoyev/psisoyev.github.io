@@ -307,8 +307,8 @@ Good news! We have mocked the first method in the service.
 Unfortunately, there are some bad news as well: we have to implement interaction with the mock instance for every method. 
 Sounds boring.
 However, some people say "work smarter, not harder".
-Guys from the ZIO community were inspired by these words and have created [zio-macros project](https://github.com/zio/zio-macros).
-Later, parts of this project were moved into ZIO core and ZIO test. 
+That is why we can write a macro, that will do some work for us.
+Fortunately, in our case, we don't even need to write macros ourselves as it is already done by people from ZIO community.  
 Like `@accessible` macro that we saw before.
 Another annotation, that we can use to simplify our life is `@mockable`. 
 
