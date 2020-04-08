@@ -168,8 +168,8 @@ Anyway, it is a bit off topic. Let's go back to our test scenario.
 
 To compare the results we use `assertM` method which has two argument lists: the actual value and the expected value.
 If we would like to do the same for pure values, we would call `assert` method.
-ZIO provides different expectations that you can use to build your assertions: `isEmpty`, `equalTo`, `isLessThen`, `contains` and many others.
-You can even compose these assertions together, eg. `isRight(isSome(equalTo(1)))`
+ZIO provides set of basic assertions: `isEmpty`, `equalTo`, `isLessThen`, `contains` and many others.
+These assertions can be composed into a more complex checks: `isRight(isSome(equalTo(1)))`.
 Names of the expectations should give us a hint about what they are doing. 
 If you would like to learn more please check the [Scaladoc](https://github.com/zio/zio/blob/master/test/shared/src/main/scala/zio/test/Assertion.scala).
 Provided expectations can be used to build your custom expectations.
@@ -237,7 +237,7 @@ This example is taken from [ZIO codebase](https://github.com/zio/zio/blob/master
 ```scala
 testM("expect call for overloaded method") {
   val app = random.nextInt
-  val env = MockRandom.NextInt._1(value(42))
+  val env = MockRandom.NextInt(value(42))
   val out = app.provideLayer(env)
   assertM(out)(equalTo(42))
 }
