@@ -163,11 +163,8 @@ import zio.macros.accessible
 @accessible
 object SubscriptionLogic {
 ```
-This is not mandatory but can help you to save some time writing those accessor methods and clean some of the boilerplate out of your modules.
-However, using macros comes with a cost. 
-Compilation time might be slightly increased and it seems that macros will change in Scala 3. 
-It could mean you will have to re-write some of the code. 
-That was a bit offtopic. Let's go back to our scenario. 
+This is not mandatory but can help you to save some time writing those accessor methods and clean some of the boilerplate out of your modules. 
+Anyway, it is a bit off topic. Let's go back to our test scenario. 
 
 To compare the results we use `assertM` method which has two argument lists: the actual value and the expected value.
 If we would like to do the same for pure values, we would call `assert` method.
@@ -482,8 +479,7 @@ I like how the code in ZIO Test is well organized. You can easily find tools tha
 There are no magical implicit conversions, that you have to remember to import. 
 There are macros in the framework but you are not obliged to use them. 
 You have a choice either to write some boilerplate, that will clutter our code or generate some code with macros. 
-Having no macros might benefit you in the long-term, when you will move your code to Scala 3.
-Also, as we have seen not all IDEs support macro generated code (at the moment of writing).
+As we have seen not all IDEs support macro generated code (at the moment of writing).
 As we are working with effects, we always have async runtime and we never use blocking in tests.
 Tests written with ZIO Test are isolated but can use shared resources without heavy machinery involved.
 The framework makes sure that resources are closed properly.
