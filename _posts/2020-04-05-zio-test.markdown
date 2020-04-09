@@ -279,7 +279,8 @@ object SubscriptionLogicMock extends Mock[SubscriptionLogic] {
     ... // skipping the rest
 }
 ```
-Here we can see one of the service method definitions. 
+`SubscriptionLogicMock` is extending `Mock` trait which brings us some mocking capabilities to mock service behaviour.
+Above we can see one of the service method definitions.
 We make it an object, which extends `Effect` and specifies method inputs, error type and outputs as type parameters.
 All the inputs are gathered in one big tuple. In case if you don't have an input, it would be just a `Unit`.
 In our case for all the service methods we use `Effect` as service always returns an effect. 
