@@ -11,7 +11,7 @@ This article will help you to effectively test your "effectful" ZIO code.
 
 In the [previous article](https://scala.monster/welcome-zio/) we were exploring ZIO.
 We've built the [release pager](https://scala.monster/design-a-pager/) application but we have skipped something very important - unit tests.
-In this article, we will continue to develop the application. We will write unit tests for it.
+In this article, we will continue to develop the application. This time the target is to create unit tests for it.
 Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/master/service/src/test/scala/io/pager).
 
 Please note that we will be using nightly build of ZIO.
@@ -62,12 +62,12 @@ object LiveSubscriptionLogicSpec extends DefaultRunnableSpec {
 }
 
 ```
-To start, we import `zio.test` package. This package contains ZIO Test building blocks.
+To start, we import `zio.test` package. It contains ZIO Test building blocks.
 We extend `DefaultRunnableSpec` trait which is similar to `zio.App` - it provides `ZEnv` (Random, Clock etc.) and runs provided scenarios.
 To create a spec we use `suite` method, which has two parameters - suite name and test scenarios.
 From now we can run our unit tests by clicking `Run` button near the class name in IntelliJ IDEA or using `sbt test` command.
 
-We have defined our first spec. Currently, it is empty. Let's fix that.
+We have defined our first spec. Currently, it is empty, so let's fix that.
 [Last time](https://scala.monster/welcome-zio/) we have implemented `SubscriptionLogic`. 
 The main task of it is to handle user subscriptions to GitHub repositories.
 As we are writing unit tests we would like to abstract from the database and will store everything in memory. 
@@ -89,7 +89,7 @@ private def service(
 }
 ```
 In order to instantiate the service, we have to provide an initial in-memory state. 
-The state is used to instantiate storage services, which are used in `SubscriptionLogic.Live` service. 
+It is used to instantiate storage services, which are used in `SubscriptionLogic.Live` service. 
 We express the state using `Map` collection wrapped in `zio.Ref`. 
 Then this `Ref` is converted to `ZLayer` and provided to `inMemory` layer recipe.
 By default, these maps are empty and do not contain any data.
@@ -222,12 +222,12 @@ In other cases, we could use `||` (OR) operator. Also, we can negate the asserti
 For those who don't like symbolic notations, there are named versions of the operators. 
 Check the [code](https://github.com/zio/zio/blob/master/test/shared/src/main/scala/zio/test/BoolAlgebra.scala) to get a better understanding of the available operations.
 
-To avoid that kind of mistakes I would recommend you trying a linter. 
+To avoid that kind of mistakes I would recommend trying a linter. 
 Code reviews might also help but these mistakes are quite hard to spot. 
 In this specific project I have used [Wartremover](https://www.wartremover.org/).
 It's a Scala linter, that has a flag `NonUnitStatements` which will help you to find unused effects at compilation step. 
 Unfortunately, linters have their own drawbacks. 
-`Wartremover` caught quite a lot of false positives and we have to exclude some of the checks.
+`Wartremover` caught quite a lot of false positives. Because of that we have to exclude some of the checks.
 You could also try using other linters, that look for non-unit statements, `Wartremover` is just an example.
 Also, if you like experimental stuff you could try [ZIO shield](https://github.com/zio/zio-shield).
 
@@ -305,9 +305,8 @@ val compose: URLayer[Has[Proxy], SubscriptionLogic] =
           ... // skipping the rest
 ```
 Good news! We have mocked the first method in the service.
-Unfortunately, there are some bad news as well: we have to implement interaction with the mock instance for every method. 
-Sounds boring.
-However, some people say "work smarter, not harder".
+Unfortunately, there are some bad news as well - we have to implement interaction with the mock instance for every method. 
+Sounds boring, however, some people say "work smarter, not harder".
 That is why we can write a macro, that will do some work for us.
 Fortunately, in our case, we don't even need to write macros ourselves as it is already done by people from ZIO community.  
 Like `@accessible` macro that we saw before.
@@ -410,7 +409,7 @@ Also, a test will fail if we have called a method with unexpected arguments.
 Basically, the framework gives us the possibility to set strict expectations and tests will fail when something unexpected happens. 
 As we have several expectations of the mock we must chain these expectations using `andThen` or symbolic alias `++`.
 Note, that `++` operation is not associative. This means that we must keep the correct mocked method call order.
-If we do not care about the order we can use another operator - `&&`. Then we can define expectations in any order. 
+If we do not care about the order we can use another operator - `&&`. 
 That's not all, with this operator we can compose expectations from different services together:
 ```scala
 val mocks: Expectation[GitHubClient with TelegramClient with SubscriptionLogic] =
@@ -475,18 +474,18 @@ Be careful, blindly marking all tests as `nonFlaky` will affect your test perfor
 By default, the framework will run the spec for 100 times.
 
 ## Summary 
-In this article we have explored ZIO Test and its capabilities:
-* we used building blocks from `zio.test` to construct a spec
-* we replaced storage state with an in-memory implementation, which we have constructed in a test
-* we applied property-based testing and created data generators
-* we learned how to compare expected results with actual results using `assert`
-* we avoided common mistake with effect chaining
-* we touched resource mocking
-* we built service call expectations using mocks
-* we mocked all the service dependencies
-* we removed all the boilerplate required for service mocking using macros
-* we saw what issues we can expect from using macros and how to handle them
-* we added test features using aspects
+In this article we have explored ZIO Test and its capabilities, we:
+* used building blocks from `zio.test` to construct a spec
+* replaced storage state with an in-memory implementation, which we have constructed in a test
+* applied property-based testing and created data generators
+* learned how to compare expected results with actual results using `assert`
+* avoided common mistake with effect chaining
+* touched resource mocking
+* built service call expectations using mocks
+* mocked all the service dependencies
+* removed all the boilerplate required for service mocking using macros
+* saw what issues we can expect from using macros and how to handle them
+* added test features using aspects
 
 That's a lot! The best part of this is that there are more things that you can explore by yourself:
 resource management (we saw just a little example), ScalaJS support, etc. 
@@ -507,14 +506,14 @@ I would like to underline the fact, that at the moment of writing, ZIO is not ye
 There are still some [open issues](https://github.com/zio/zio/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen) on GitHub. 
 To be fair, there are quite many open issues, but there are only few, that are blockers for the official release.
 
-If you try to use the framework yourself, you could have a feeling that there is missing tooling. 
-It might be that in some exotic use cases you will miss some of the testing framework functionality.
+If you try to use the framework yourself, you could have a feeling that some of the tooling is missing. 
+It might be, that in some exotic use cases you will miss some of the testing framework functionality.
 But look at it from the other side - you have a chance to get a hands on experience in development of open source framework. 
 This is your opportunity to drive the direction of this specific technological ecosystem.
 
 It really feels that ZIO community is investing a lot to make it easy for new users to onboard and start using the framework. 
 There are many [other projects](https://github.com/zio) in the ecosystem that are actively developed. 
-I'm happy to continue my journey through the ecosystem. 
+I'm happy to continue my journey through it. 
 
 If you are interested in getting notifications whenever new article is out - [follow me on Twitter](https://twitter.com/scalamonster).
 Tune in!
