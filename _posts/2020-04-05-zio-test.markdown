@@ -12,7 +12,7 @@ This article will help you to effectively test your "effectful" ZIO code.
 In the [previous article](https://scala.monster/welcome-zio/) we were exploring ZIO.
 We've built the [release pager](https://scala.monster/design-a-pager/) application but we have skipped something very important - unit tests.
 In this article, we will continue to develop the application. This time the target is to create unit tests for it.
-Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/master/service/src/test/scala/io/pager).
+Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager).
 
 Please note that we will be using nightly build of ZIO.
 We should not expect to see ZIO API changes in the next release candidates before the official release of version 1.0.
