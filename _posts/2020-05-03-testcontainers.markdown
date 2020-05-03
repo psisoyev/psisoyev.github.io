@@ -1,10 +1,10 @@
 ---
 layout: post
-title: Integration tests with Testcontainers
+title: Integration tests with Testcontainers and Docker
 date: 2020-05-03 13:37:00 +0100
 description: This post describes application integration testing with help of Testcontainers
 img: testcontainers/docker.png
-tags: [scala, testing, munit, testcontainers]
+tags: [scala, testing, munit, testcontainers, docker]
 comments: true
 ---
 
