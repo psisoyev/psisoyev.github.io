@@ -65,7 +65,6 @@ Let's add necessary dependencies:
 val mUnit = "org.scalameta" %% "munit" % "0.7.4" % Test)
 
 val testContainers = List(
-    "testcontainers-scala-core",
     "testcontainers-scala-munit",
     "testcontainers-scala-pulsar"
   ).map("com.dimafeng" %% _ % "0.37.0" % Test)
