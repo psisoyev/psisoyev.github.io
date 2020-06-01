@@ -2,7 +2,7 @@
 layout: post
 title: Integration tests with Testcontainers and Docker
 date: 2020-05-03 13:37:00 +0100
-description: This post describes application integration testing with help of Testcontainers
+description: This post describes integration testing with help of Testcontainers
 img: testcontainers/docker.png
 tags: [scala, testing, munit, testcontainers, docker]
 comments: true
@@ -10,9 +10,9 @@ comments: true
 
 In this post, I will describe a Scala application integration testing process using [Testcontainers](https://www.testcontainers.org/).
 
-The goal of this blog post to give you ideas on how you can improve your integration testing process. Before we start we should align on terminology. 
+The goal of this blog post is to give you ideas on how you can improve your integration testing process. Before we start we should align on terminology. 
 When I say integration tests I mean tests that check the integrity of a component with the environment around it. 
-The environment could be other system components or a database, for example.
+The environment could be for example other system components or a database.
 
 You can find all the code samples you will see below on [GitHub](https://github.com/psisoyev/testcontainers-example).
 
@@ -25,7 +25,7 @@ You have to select which containers you want to use and the framework will take 
 That is why for the very first time you run a test it might take some time. 
 Docker will download all the necessary images. 
 For example, if you are using Apache Pulsar container in your test you will have to download the container (if you already don't have it on your machine).
-Apache Pulsar version 2.2.0 image is about 1.8 GB, so it might take some time if you have [Dial-up Internet access](https://en.wikipedia.org/wiki/Dial-up_Internet_access).
+Apache Pulsar version 2.2.0 image is about 1.8 GB, so it might take some time if you have [dial-up Internet access](https://en.wikipedia.org/wiki/Dial-up_Internet_access).
 Container images are stored on your machine so whenever you will have to re-run the test again it will be much faster because the image will be already there.
 
 ## The service
@@ -56,7 +56,7 @@ If you don't have it for some reason, [this is](https://docs.docker.com/get-dock
 
 Another thing we need - framework for unit testing. In examples below I will be using [MUnit](https://scalameta.org/munit/). 
 It is a new super light framework which provides essentials for unit testing.
-Unfortunately, because it is a new framework integration with some tools is missing.
+Unfortunately, because it is a new framework, integration with some tools is missing.
 That shouldn't be a show stopper for us.
 For convenience, I have [implemented](https://github.com/testcontainers/testcontainers-scala/pull/119) the integration and now it is available for everyone.
 Alternatively, we could just use Scalatest, but that's boring, right?
@@ -105,7 +105,7 @@ The only thing we have to do is to override `containerDef` which is container de
 For that, we use `PulsarContainer.Def()` as it is the container we would like to use. 
 If we want to use a specific version of Apache Pulsar we can specify it in the constructor, for example, `PulsarContainer.Def("2.2.0")`.
 If you are planning to have several test suites with a specific container version I would recommend you to extract version to configuration or a singleton object.
-When the time will come to change it you will have to change it only in one place.
+When the time will come to change it, you will have to change it only in one place.
 
 Next, define a test scenario with `test` method from MUnit as you would normally do.
 Then wrap your scenario into `withContainers` block and we are done. 
@@ -138,7 +138,7 @@ override def beforeAll(): Unit = {
 ```
 
 Some readers could ask: Pavels, what should I do if I need 2 or more containers in a test? 
-No worries my friend, I have a solution.
+No worries my friends, I have a solution.
 
 ## Multiple container test
 Sometimes you want to run several containers in one test suite.
@@ -178,7 +178,7 @@ Using `withContainers` we access both containers in the test body.
 In all previous examples, we were starting containers once for all test scenarios. 
 In some cases, we would need to have a fresh container for every test case.
 For that we can use `TestContainerForEach` for one container and `TestContainersForEach` for several.   
-We can take every test above and just replace Testcontainers trait we used. That is it. We don't have to do anything else.
+We can take every test above and just replace Testcontainers trait that we used. That is it. We don't have to do anything else.
 
 However, we should be careful here with `beforeEach()` and `afterEach()` methods. 
 Similarly to `beforeAll()` and `afterAll()` if we want to override them we have to call `super` method.
@@ -310,7 +310,7 @@ class DockerComposeSpec extends FunSuite with TestContainerForAll {
   }
 }
 ```
-The test is similar to the suites we have seen before. Except for few details. 
+Except for a few details, the test is similar to the suites we have seen before. 
 We have to use `DockerComposeContainer`, which accepts `docker-compose` as one parameter and list of exposed services as another.
 Actually there are more than two parameters and you can explore them yourself. 
 In the scenario above we retrieve Nginx container by its name and we can do with it everything we did before and even more.
@@ -327,7 +327,7 @@ We saw how to write test scenarios for a different amount of containers.
 This might come handy if you want to create a complex test for your service and environment around it.
 
 Having the possibility to customize containers can make testing efficient. 
-You can containerize your applications and use them in test scenarios. 
+You can pack your applications into containers and use them in test scenarios. 
 
 Also, we have seen that it is easy to write tests that can check backward compatibility of your services. 
 We can use different versions of the same service for one test scenario. 
