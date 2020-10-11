@@ -30,7 +30,7 @@ What are the alternatives? How about delegating this task to someone, who will e
 What is the most convenient way to deliver a message nowadays? 
 People have different habits, but for me, online messaging is the most convenient way of doing it today.  
 However, on my mobile phone, there are at least 4 messaging apps. Currently, my favorite is [Telegram](https://telegram.org/). 
-I have [stickers of my cat](https://t.me/addstickers/CATZILLA666) in Telegram. I hope you don't need other arguments.
+I have [stickers of my cat](https://t.me/addstickers/CATZILLLA) in Telegram. I hope you don't need other arguments.
     
 ### The solution
 
