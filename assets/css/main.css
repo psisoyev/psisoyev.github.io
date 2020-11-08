@@ -142,7 +142,7 @@ kbd,
 samp {
   font-family: monospace, monospace;
   /* 1 */
-  font-size: 1em;
+  font-size: 0.85em;
   /* 2 */
 }
 
@@ -444,7 +444,7 @@ template {
 }
 
 .highlighter-rouge {
-  color: #ce887b;
+  color: #c08800;
   font-weight: 400;
   border: 1px solid #d8d8d8;
   -webkit-border-radius: 3px;
@@ -468,7 +468,7 @@ template {
 
 /* Error */
 .highlight .k {
-  color: #069;
+  color: #cc6b01;
 }
 
 /* Keyword */
@@ -582,7 +582,7 @@ template {
 
 /* Literal.Number */
 .highlight .s {
-  color: #d44950;
+  color: #19842d;
 }
 
 /* Literal.String */
@@ -597,7 +597,7 @@ template {
 
 /* Name.Builtin */
 .highlight .nc {
-  color: #0a8;
+  color: #00a383;
 }
 
 /* Name.Class */
@@ -622,7 +622,7 @@ template {
 
 /* Name.Exception */
 .highlight .nf {
-  color: #7923c7;
+  color: #300088;
 }
 
 /* Name.Function */
@@ -642,8 +642,19 @@ template {
 
 /* Name.Tag */
 .highlight .nv {
-  color: #033;
+  color: #550132;
 }
+
+/* Name.Tag */
+.highlight .py {
+  color: #0099ab;
+}
+
+/* Name.Tag */
+.highlight .n {
+  color: #550132;
+}
+
 
 /* Name.Variable */
 .highlight .ow {
