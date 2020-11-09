@@ -177,7 +177,7 @@ Also `F` should have a `Monad` instance to chain function calls.
 Let's start by implementing a validation logic that will check if `Departure` is valid.
 We will have only 1 check - if the destination city is in the list of connected cities.
 ```scala
-def validated(departure: Departure)(f: => F[Departed]): F[Either[DepartureError, Departed]] = {
+def validated(departure: Departure)(f: F[Departed]): F[Either[DepartureError, Departed]] = {
   val destination = departure.to.city
 
   connectedTo.find(_ === destination) match {
