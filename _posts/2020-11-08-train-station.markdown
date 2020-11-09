@@ -395,14 +395,12 @@ Creating a consumer requires slightly more actions, as we also have to create a 
 def consumer(client: PulsarClient, config: Config, city: City): Resource[F, Consumer[F, E]] = {
   val name         = s"${city.value}-${config.city.value}"
   val subscription = Subscription(Subscription.Name(name)).withType(Subscription.Type.Failover)
-  val options      = Consumer.Options[F, E]().withAutoAck
 
-  Consumer.withOptions[F, E](client, topic(config.pulsar, city), subscription, options)
+  Consumer.create[F, E](client, topic(config.pulsar, city), subscription)
 }
 ```
 We create a subscription with a name corresponding to a connected city name plus the city we'd like to run. 
 By default, we will use the `Failover` subscription type as it allows us to run 2 instances in parallel, just in case one will go down.
-Also, we will use `autoAck` function of the `Consumer` - every message that we will process will be automatically acknowledged and removed from the topic.
 
 Together with the required `Ref` we can finally build our `Resources`:
 ```scala
