@@ -235,16 +235,17 @@ def make[F[_]: Applicative: Logger](
     expectedTrains: ExpectedTrains[F]
   ): DepartureTracker[F] = new DepartureTracker[F] {
     def save(e: Departed): F[Unit] =
-      if (e.to.city =!= city) F.unit
-      else
+      val updateExpectedTrains =
         expectedTrains.update(e.trainId, ExpectedTrain(e.from, e.expected)) *>
           F.info(s"$city is expecting ${e.trainId} from ${e.from} at ${e.expected}")
+    
+      updateExpectedTrains.whenA(e.to.city === city)
   }
 ```
 We have a dependency on `ExpectedTrains` service. 
 This service is the storage of incoming trains. 
 We will implement it shortly. 
-Here we have `save` function, which checks that the destination city of the incoming train is the expected one. 
+Here we have implemented `save` function, which works only when the destination city of the incoming train is the expected one. 
 For example, both Geneva and Zurich are consuming events from Bern. When Bern emits a `Departed` event, one city will just ignore the message.       
 The other city, which is the destination city, will update the expected train list and create a log message.
 
