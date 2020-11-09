@@ -95,7 +95,7 @@ which is listened to by a `Consumer` of another system,
 that is attached using a `Subscription`.
 
 Simple as that. Almost. In a fact, it is a slightly more complicated process 
-and if you want to learn more about Apache Pulsar check [documentation](https://pulsar.apache.org/docs/en/pulsar-2.0/).
+and if you want to learn more about Apache Pulsar [check out its documentation](https://pulsar.apache.org/docs/en/pulsar-2.0/).
 
 # The multi-billion business logic 
 Earlier we mentioned two events that can happen on the railway - train departure and arrival. It is time to define them:
