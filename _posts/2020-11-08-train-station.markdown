@@ -6,7 +6,7 @@ description: This post introduces Apache Pulsar to Scala developers
 img: train-station/trains.png
 tags: [scala, apache pulsar, neutron, zio, tagless final, fs2]
 comments: true
-hidden: true
+hidden: false
 ---
 
 I took this photo while crossing [Landwasser viaduct](https://en.wikipedia.org/wiki/Landwasser_Viaduct) in Filisur, Switzerland.
