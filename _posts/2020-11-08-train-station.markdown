@@ -163,8 +163,9 @@ Inside the `Departures` companion object we create function `make`:
 ```scala
 object Departures {
   def make[F[_]: Monad: UUIDGen: Logger](
-    city: City,
-    producer: Producer[F, Event]
+      city: City,
+      connectedTo: List[City],
+      producer: Producer[F, Event]
   ): Departures[F] = new Departures[F] {
     def register(departure: Departure): F[Either[DepartureError, Departed]] = ???
   }
