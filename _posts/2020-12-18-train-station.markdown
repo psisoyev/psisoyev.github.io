@@ -42,11 +42,11 @@ The toolkit has much more to offer you:
 * Optics;
 * Many other small but very useful utilities.
 
-# Clean up your business logic ???
+# Raki na mide ???
 The first thing we will see today is how to clean up application business logic from cross-cutting concerns surrounding the core of the logic. 
 For this we will use a class called `Mid`. 
 It might slightly remind you aspect-oriented programming.  
-The idea is very simple - we extract generic (???) logic from the core logic. 
+The idea is very simple - we extract utility logic from the core logic. 
 For example, logging or input data validation can be extracted into small separate modules. 
 
 We will start with cleaning up `Departures` service which we have created in the [previous article](https://scala.monster/train-station/).
