@@ -42,6 +42,10 @@ The toolkit has much more to offer you:
 * Optics;
 * Many other small but very useful utilities.
 
+An important thing to mention is that the toolkit is not a `cats`/`cats-effect`/`Monix`/`ZIO`/`YOURIO` killer. 
+I can't say something like "I'm using tofu stack". There is no "tofu stack". 
+The idea of the toolkit is to improve your Tagless Final code for whatever effect runtime system you have.
+
 # Raki na mide ???
 The first thing we will see today is how to clean up application business logic from cross-cutting concerns surrounding the core of the logic. 
 For this we will use a class called `Mid`. 
@@ -104,7 +108,7 @@ Aand that's it. We don't need anything else here for logging.
 If you think this logging class was simple, then validation will be even simpler for you.
 We create a new class:
 ```scala
-class Validate[F[_]: Monad: Raise[*[_], DepartureError]](connectedTo: List[City]) extends Departures[Mid[F, *]] {
+class Validate[F[_]: Monad: DepartureError.Raising](connectedTo: List[City]) extends Departures[Mid[F, *]] {
   def register(departure: Departure): Mid[F, Departed] = { registration =>
     val destination = departure.to.city
 
@@ -114,7 +118,7 @@ class Validate[F[_]: Monad: Raise[*[_], DepartureError]](connectedTo: List[City]
   }
 }
 ```
-Here we add a new context bound which we haven't seen before - `Raise`. 
+Here we add a new context bound which we haven't seen before - `DepartureError.Raising`. 
 We will have a closer look at it later, when we will be talking about error management.
 All the rest looks similar to logging class we saw before - we extends `Departures` trait with `Mid` as the effect. 
 However, this time, the only thing we need is to do some actions before calling the core logic. 
@@ -123,17 +127,17 @@ So we run our validation logic and call `registration` method `orRaise` an error
 The only missing thing is gluing all the pieces together. 
 e will use the same `make` method we had before, where we will initialize the classes and wire everything together. 
 ```scala
-def make[F[_]: Monad: GenUUID: Logger: Raise[*[_], DepartureError]](
+def make[F[_]: Monad: GenUUID: Logger: DepartureError.Raising](
     city: City,
     connectedTo: List[City]
-  ): Departures[F] = {
-    val service = new Impl[F](city)
+): Departures[F] = {
+  val service = new Impl[F](city)
 
-    val log      = new Log[F]
-    val validate = new Validate[F](connectedTo)
+  val log      = new Log[F]
+  val validate = new Validate[F](connectedTo)
 
-    (log |+| validate).attach(service)
-  }
+  (log |+| validate).attach(service)
+}
 ```
 First, we create an instance of core logic class, then instances for logging and validation classes.
 We attach utility classes to the core service with a special method `attach`. 
@@ -148,15 +152,16 @@ Luckily, the easiest way to get an instance of it is to simply add an annotation
 trait Departures[F[_]] {
 ```
 This `derive` annotation comes from another cool library called [`derevo`](https://github.com/manatki/derevo). 
-The purpose of this library is different instance derivation using a single macro annotation.
+The purpose of this library is various instance derivation using a single macro annotation.
 
 Now the code compiles and we can be happy about having cleaner business logic. 
 Here is the [link to the final code](https://github.com/psisoyev/train-station-tofu/blob/master/service/src/main/scala/com/psisoyev/train/station/departure/Departures.scala#L24).
 Yes, the final version has slightly more lines of code, but it's a low price to pay for the clean code.
 
-You might be not convinced with the example above because in your case you don't log inputs and outputs, validation service is a separate entity.
-We could do this with `Arrivals` as it's validation is much bigger and potentially could grow even more. 
-At the same time, we could use the same `Mid` concept even in the validator itself. [Have a look](https://github.com/psisoyev/train-station-tofu/blob/master/service/src/main/scala/com/psisoyev/train/station/arrival/ArrivalValidator.scala#L20).
+Some people might be not convinced with the example above because they don't log inputs and outputs. 
+Also, it's fine to have the validation service as a separate class.
+Actually, this is what we did with `Arrivals` service, as it's validation is much bigger and potentially could grow even more. 
+However, `Mid` concept can be used even in the validation service as well. [Have a look](https://github.com/psisoyev/train-station-tofu/blob/master/service/src/main/scala/com/psisoyev/train/station/arrival/ArrivalValidator.scala#L20).
 There are more ideas what you could extract to `Mid`:
 * tracing;
 * authentication;
@@ -167,9 +172,70 @@ There are more ideas what you could extract to `Mid`:
 * event publishing;
 * and even more.
 
-Another bonus of having core logic extracted is that you can substitute the logic itself without changing the plumbing around.
-It means that logging, monitoring, tracing and all the other "not so important" stuff will stay as is.
+Another bonus of having core logic extracted is that it's possible to substitute the logic itself without changing the plumbing around.
+It means that logging, monitoring, tracing and all the other utilities will stay as is.
 
+# Improved error handling
+Error handling is always a great topic for a holy war in the Internet. 
+Everyone knows how to do it in the best way, but everyone does that differently.
+
+Tofu also provides a way to handle business errors. As an example we will take care of `Departure` validation.
+Above, we've already seen a new context bound in `Departures` service - `DepartureError.Raising`.
+It is signaling that this service can raise a `DepartureError`.
+We've added it in `DepartureError` companion object:
+```scala
+sealed trait DepartureError extends NoStackTrace
+object DepartureError {
+  type Handling[F[_]] = Handle[F, DepartureError]
+  type Raising[F[_]]  = Raise[F, DepartureError]
+  
+  case class UnexpectedDestination(city: City) extends DepartureError
+}
+```
+Here we also add a `Handling` type alias, which will be used as a context bound in services which must handle `DepartureError`.
+
+How do we use it? Easy, we already did it in the code above:
+```scala
+connectedTo
+  .find(_ === destination)
+  .orRaise(UnexpectedDestination(destination)) *> registration
+```
+We look for a train destination city in the `List` of connected cities. 
+The result of this search is an `Option`.  
+In the import section we add syntactic sugar import `import tofu.syntax.raise._`.
+It contains method `orRaise` which we call on `Option`. 
+If it is empty, we will raise an error, that we will have to handle later on.
+There are other convenience methods to raise an error in different situations that can be found [here](https://github.com/TinkoffCreditSystems/tofu/blob/4337b6370ab0e7251ba87c02d1901e7d82f65b6b/core/src/main/scala/tofu/syntax/error.scala#L43).
+In my opinion, the easiest way to learn all the syntactic sugar is by reading the code. 
+
+Handling errors is not much different from `ApplicativeError`/`MonadError` handling. 
+However, if there is a class, which has two `ApplicativeError` context bounds, compiler will fail because of two implicit `Applicative` instances.
+Then it's possible to extract these implicits in a separate argument list but there is a better alternative. 
+Alternatively, we can use `Handle` from Tofu.  
+We have defined `Handling` type alias for `DepartureError` handling and we have exactly the same alias for `ArrivalError`.
+Station routes require both and it is not a problem, as they don't rely on `Applicative`, `Monad` and friends:
+```scala
+class StationRoutes[I[_]: Monad: DepartureError.Handling: ArrivalError.Handling]
+```
+
+In order to easily handle these errors we need to import syntactic extensions again. 
+Note the difference, this time we are importing `handle` package: `import tofu.syntax.handle._`.
+Simplified version of the code looks like this:
+```scala
+val registration = departures.register(newDeparture) *> Ok()
+
+registration.handleWith(handleDepartureErrors)
+```
+Where `handleDepartureErrors` is just a function that converts a `DepartureError` to an HTTP response:
+```scala
+def handleDepartureErrors: DepartureError => I[Response[I]] = { 
+  case DepartureError.UnexpectedDestination(city) => BadRequest(s"Unexpected city $city")
+}
+```
+Similarly to `DepartureError` we create one for `ArrivalError`. 
+The final code with error handling is available in [the repository](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala).    
+
+# 
 
 # Summary
 Thank you for reading up to this point. 
