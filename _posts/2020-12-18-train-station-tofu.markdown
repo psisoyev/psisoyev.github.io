@@ -108,7 +108,9 @@ Aand that's it. We don't need anything else here for logging.
 If you think this logging class was simple, then validation will be even simpler for you.
 We create a new class:
 ```scala
-class Validate[F[_]: Monad: DepartureError.Raising](connectedTo: List[City]) extends Departures[Mid[F, *]] {
+class Validate[F[_]: Monad: DepartureError.Raising](
+  connectedTo: List[City]
+) extends Departures[Mid[F, *]] {
   def register(departure: Departure): Mid[F, Departed] = { registration =>
     val destination = departure.to.city
 
