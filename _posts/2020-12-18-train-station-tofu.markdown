@@ -9,8 +9,8 @@ comments: true
 hidden: true
 ---
 
-In my previous article I've created an event-driven system built on top of Apache Pulsar. 
-The system was built in Scala and was using Tagless Final technique. 
+In my previous blog post I've created an event-driven system built on top of Apache Pulsar. 
+The system was developed in Scala using the Tagless Final technique. 
 In this article I would like to introduce you to a cool kid on the block that you might not know yet. 
 Meet [Tofu](https://github.com/TinkoffCreditSystems/tofu) - a functional programming toolkit aimed at taming the complexity of Tagless Final approach.
 I will show how you can use utilities from Tofu to improve your codebase. 
