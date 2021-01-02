@@ -9,36 +9,36 @@ comments: true
 hidden: true
 ---
 
-In my previous blog post I've created an event-driven system built on top of Apache Pulsar. 
-The system was developed in Scala using the Tagless Final technique. 
-In this article I would like to introduce you to a cool kid on the block that you might not know yet. 
+In my previous blog post, I've created an event-driven system built on top of Apache Pulsar.
+The system was developed in Scala using the Tagless Final technique.
+In this article, I would like to introduce you to a cool kid on the block that you might not know yet.
 Meet [Tofu](https://github.com/TinkoffCreditSystems/tofu) - a functional programming toolkit aimed at taming the complexity of Tagless Final approach.
-I will show how you can use utilities from Tofu to improve your codebase. 
-However, I must warn you that some of the concepts might be advanced and look complex at the first sight but are actually pretty simple when you have a closer look.
+I will show how you can use utilities from Tofu to improve your codebase.
+However, I must warn you that some of the concepts might seem advanced and look complex at the first sight but are actually pretty simple when you have a closer look.
 
-In order to compare code improved with Tofu with traditional Tagless Final application I've cloned the [train-station](https://github.com/psisoyev/train-station) repository.
+In order to compare code improved with Tofu with traditional Tagless Final application, I've cloned the [train-station](https://github.com/psisoyev/train-station) repository.
 We will use the same application to improve it with Tofu and then we will be able to compare the results.
-If you are like me and prefer reading code first and then read the article jump straight to the [new repo](https://github.com/psisoyev/train-station-tofu).
+If you are like me and prefer reading the code first and then read the article jump into the [new repo](https://github.com/psisoyev/train-station-tofu).
 
 In this article I will show you how to:
-* clean up your business logic from boilerplate; 
+* clean up your business logic from boilerplate;
 * improve error handling;
 * split runtime effect from application initialization effect;
-* enable context aware tracing;
-* enable context aware logging;
+* enable context-aware tracing;
+* enable context-aware logging;
 * enable JSON formatted logging;
 * ???
 
-I can't say that you must use all of that in your application as you and your team can already have built your own habits and style. 
-My personal feeling is that Tagless Final is a great way of describing your application, however, sometimes the current ecosystem lacks of tooling. 
-The idea of this post is to show you what is possible but it doesn't mean it will solve all your problems.
+I can't say that you *must* use all of that in your application as you and your team can already have built your own habits and style. 
+My personal feeling is that Tagless Final is a great way of describing your application, however, sometimes the current ecosystem lacks some tooling. 
+The idea of this post is to show you how to improve this but it doesn't mean it will solve all your problems.
 You can use only part of the toolkit to solve particular problems. For that, the toolkit is split into several sub-modules. 
 More info on this you can find in the [README file](https://github.com/TinkoffCreditSystems/tofu#quick-start).
 
-The toolkit has much more to offer you: 
+The toolkit has much more to offer you:
 * Agent - `Ref` on steroids, which allows effectful updates;
-* Granular typeclasses for forking and racing;
-* Env - a monad which allows composition of functions that are context-aware;
+* Granular type classes for forking and racing;
+* Env - a monad that allows composition of functions that are context-aware;
 * Optics;
 * Many other small but very useful utilities.
 
