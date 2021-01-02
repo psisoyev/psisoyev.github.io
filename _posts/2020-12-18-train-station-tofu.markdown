@@ -46,7 +46,7 @@ An important thing to mention is that the toolkit is not a `cats`/`cats-effect`/
 I can't say something like "I'm using tofu stack". There is no "tofu stack". 
 The idea of the toolkit is to improve your Tagless Final code for whatever effect runtime system you have.
 
-# Raki na mide ???
+# %Mid title% ???
 The first thing we will see today is how to clean up application business logic from cross-cutting concerns surrounding the core of the logic. 
 For this we will use a class called `Mid`. 
 It might slightly remind you aspect-oriented programming.  
@@ -105,8 +105,7 @@ We basically surround the resulting effect with two other effects - a log before
 The ice-cream symbols `*>` and `<*` are just symbolic aliases to `flatMap` method which drops the output.
 Aand that's it. We don't need anything else here for logging. 
 
-If you think this logging class was simple, then validation will be even simpler for you.
-We create a new class:
+Similarly to `Log` class we create one for validation:
 ```scala
 class Validate[F[_]: Monad: DepartureError.Raising](
   connectedTo: List[City]
@@ -122,9 +121,10 @@ class Validate[F[_]: Monad: DepartureError.Raising](
 ```
 Here we add a new context bound which we haven't seen before - `DepartureError.Raising`. 
 We will have a closer look at it later, when we will be talking about error management.
-All the rest looks similar to logging class we saw before - we extends `Departures` trait with `Mid` as the effect. 
-However, this time, the only thing we need is to do some actions before calling the core logic. 
-So we run our validation logic and call `registration` method `orRaise` an error. 
+Class definition is similar to logging class we saw before - we extend `Departures` trait with `Mid` as the effect. 
+However, this time, the only thing we need is to do run validation checks before calling the core logic. 
+So we run our validation logic and call `registration` method `orRaise` an error.
+If an error will be raised, then the core logic won't get called. 
 
 The only missing thing is gluing all the pieces together. 
 e will use the same `make` method we had before, where we will initialize the classes and wire everything together. 
@@ -144,7 +144,11 @@ def make[F[_]: Monad: GenUUID: Logger: DepartureError.Raising](
 First, we create an instance of core logic class, then instances for logging and validation classes.
 We attach utility classes to the core service with a special method `attach`. 
 Utility classes are combined with a special symbolic alias `|+|` which you could see in other libraries, like `cats`.
-If you are not the biggest symbolic alias fan, then you could simply call `combine` method. 
+If you are not the biggest symbolic alias fan, then you could simply call `combine` method.
+
+It might be crucial to note, that the order of running `Mid`s is reversed. 
+In our definition we have `log |+| validate`, which means validation will run first and then logging will take place.
+This might be important if there is a desire to have an explicit order. 
 
 Wait, this doesn't compile! We are missing the one last thing - we can't `combine` instances without an implicit `ApplyK` in the scope.
 This sounds complicated and might scare some people away..
@@ -208,7 +212,10 @@ In the import section we add syntactic sugar import `import tofu.syntax.raise._`
 It contains method `orRaise` which we call on `Option`. 
 If it is empty, we will raise an error, that we will have to handle later on.
 There are other convenience methods to raise an error in different situations that can be found [here](https://github.com/TinkoffCreditSystems/tofu/blob/4337b6370ab0e7251ba87c02d1901e7d82f65b6b/core/src/main/scala/tofu/syntax/error.scala#L43).
-In my opinion, the easiest way to learn all the syntactic sugar is by reading the code. 
+In my opinion, the easiest way to learn all the syntactic sugar is by reading the code.
+
+Of course, using syntactic sugar is not mandatory. There is always an option to call method `raise` on your effect, like we did with `map` of `flatMap`:
+`F.raise(UnexpectedDestination(destination))`. It is also typed and would expect a `DepartureError`. 
 
 Handling errors is not much different from `ApplicativeError`/`MonadError` handling. 
 However, if there is a class, which has two `ApplicativeError` context bounds, compiler will fail because of two implicit `Applicative` instances.
@@ -237,7 +244,67 @@ def handleDepartureErrors: DepartureError => I[Response[I]] = {
 Similarly to `DepartureError` we create one for `ArrivalError`. 
 The final code with error handling is available in [the repository](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala).    
 
-# 
+# Two effects for the price of one!
+Have you ever considered having two effect types in your Tagless Final application?
+The guys from Tofu did.
+Let me show you why it could be a good idea.
+And yeah, I've slightly exaggerated when I said about the price. 
+It doesn't come for free, but you still might be interested.
+
+Why would you need 2 different effects? 
+For those, who has some experience with `ZIO`, a situation when different services return different effects is totally normal.   
+One service can require an environment that has some contextual data. 
+Others might not need it and shouldn't even know about the existence of the context. 
+Of course context can be passed as a parameter, but then service interface is littered with unnecessary data.
+Also, there can be two different effects for initialization and runtime.
+For example, the initialization effect, which starts all the services and creates resources can be `IO` monad.   
+
+Tofu provides a way to clean up your interfaces from a context.
+
+First of all, nothing changes in the business logic services. Signatures are staying the same. There is only one effect. 
+However, this effect will be context aware. We won't need to pass user or request information to method signatures. 
+We create our context at the very top, whenever a request comes into the system. 
+In case of `train-station` it is created in `StationRoutes` when the server receives a new request.
+This means `StationRoutes` should be aware of both effects: 
+```scala
+class StationRoutes[
+  I[_]: Monad: GenUUID: DepartureError.Handling: ArrivalError.Handling,
+  F[_]: FlatMap: WithProvide[*[_], I, Context]
+](...)
+```
+Here we have 2 effects: `I` which stands for initialization. 
+From the signature we know that we will chain computations using this effect, generate new unique IDs and handle business errors. 
+The second effect `F` is slightly more interesting. We know how to `flatMap` it, but also we know how to provide `Context` to run it.   
+When we run this effect, it is converted to `I` and the result of it can be used later together with the first effect.
+
+We will use this approach to provide tracing (`traceId`) and user (`userId`) information to business logic services.
+First, let's have a look at the `Context` class we already used in the context-bound above:
+```scala
+case class Context(traceId: TraceId, userId: UserId)
+```
+`UserId` and `TraceId` are simple `newtype`s holding a `String` value.
+
+For tracing and logging capabilities in `Departures` service we build a `Context` and run it in routes: 
+```scala
+case req @ POST -> Root / "departure" =>
+  for {
+    departure <- req.asJsonDecode[Departure]
+    userId    <- getUserId(req)
+    traceId   <- I.randomUUID.map(id => TraceId(id.toString))
+    register   = departures.register(action)
+    res       <- runContext(register)(Context(traceId, userId))
+  } yield res
+```
+After we have decoded a `Departure` from the request we need to fill the `Context` with the required fields. 
+We retrieve a `userId` from the incoming request 
+(in the repository code you will see that I've cheated and I'm just generating a random `userId` for every request) and generate a new tracing id. 
+Then we build `Context` and `register` the departure. That is it - we are running the effect with a speficied context. 
+We will take a look how we use the contextual information in the next chapter.
+You can find the final implementation of the route [in the repository code](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala#L34).
+
+# Trace all the things
+# Context aware logging
+# JSON formatted logs
 
 # Summary
 Thank you for reading up to this point. 
