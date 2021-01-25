@@ -146,11 +146,19 @@ We attach utility classes to the core service with a special method `attach`.
 Utility classes are combined with a special symbolic alias `|+|` which you could see in other libraries, like `cats`.
 If you are not the biggest symbolic alias fan, then you could simply call `combine` method.
 
-It might be crucial to note, that the order of running `Mid`s is reversed.
-In our definition, we have `log |+| validate`, which means validation will run first, and then logging will take place.
-This might be important if there is a desire to have an explicit order. 
+Note, that the order of running `Mid`s is deterministic.
+In the code above, we have `log |+| validate`.
+Logging is the outer wrapper and validation is the inner. 
+It means that the order of the execution will be the following:
+```
+logging_pre
+validation_pre
+action
+validation_post
+logging_post
+```
 
-Wait, this doesn't compile! We are missing the one last thing - we can't `combine` instances without an implicit `ApplyK` in the scope.
+We are missing the one last thing - we can't combine (`|+|`) `Mid` instances without an implicit `ApplyK` in the scope.
 This sounds complicated and might scare some people away.
 Luckily, the easiest way to get an instance of it is to simply add an annotation on the original interface:
 ```scala
@@ -303,6 +311,51 @@ We will take a look at how we use the contextual information in the next chapter
 You can find the final implementation of the route [in the repository code](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala#L34).
 
 # Trace all the things
+When running a modern high-throughput application it is important to have an ability to profile and monitor different parts of the application. 
+As always there are several ways of doing it. In our train station simulator we will use tracing.
+We won't use any specific tracing library but if you are looking for one, I would recommend having a look at [Trace4Cats](https://github.com/janstenpickle/trace4cats) or [Natchez](https://github.com/tpolecat/natchez).
+We will create our own dummy tracing service, which will encapsulate the actual implementation.
+It will have one simple method `traced`:
+```scala
+trait Tracing[F[_]] {
+  def traced[A](opName: String)(fa: F[A]): F[A]
+}
+```
+
+In our dummy implementation we will just log the trace message using `StructuredLogger` from `log4cats`:
+```scala
+def make[F[_]: FlatMap: StructuredLogger: WithCtx]: Tracing[F] = new Tracing[F] {
+  def traced[A](opName: String)(fa: F[A]): F[A] =
+    askF[F] { ctx: Context =>
+      val context = Map("traceId" -> ctx.traceId.value, "operation" -> opName)
+      F.trace(context)(s"[Tracing] $opName") *> fa
+    }
+}
+```
+As you can see, we just pretend to do tracing here. 
+However, we are pretty serious with extracting context from our effect.
+In the previous part we were talking about having a separate effect with a context. Now we have a chance to try it out.
+Above, you can see a method `askF` which asks the `Context` from the effect.
+We are able to use this method we have added `WithCtx` boundary, which is a type alias to `WithContext[F, Context]`. 
+`WithContext` provides context information which can be explicitly requested.  
+
+After getting the context we build our contextual `Map`, where we store `traceId` and operation name. 
+This is logged and chained with the actual effect `fa`.
+
+From the `Departures` service side it looks pretty simple:
+```scala
+private class Trace[F[_]: Tracing] extends Departures[Mid[F, *]] {
+  def register(departure: Departure): Mid[F, Departed] = _.traced("train departure: register")
+}
+```
+We have a `Mid` called `Trace`, which requires `Tracing` class, which we've implemented above. 
+For the better user experience we've implemented `traced` extension method in `Tracing` companion object, 
+that allows us to call `traced` method straight on the effect. 
+See the full `Tracing` code [here](https://github.com/psisoyev/train-station-tofu/blob/master/service/src/main/scala/com/psisoyev/train/station/Tracing.scala).
+
+So now, by using a simple context reader and `Mid` we have cleaned up our main logic from tracing utilities. 
+All the code is fully decoupled and can be easily edited, replaced or even removed.
+
 # Context aware logging
 # JSON formatted logs
 
