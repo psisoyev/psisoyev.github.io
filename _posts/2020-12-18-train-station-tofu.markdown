@@ -311,8 +311,8 @@ We will take a look at how we use the contextual information in the next chapter
 You can find the final implementation of the route [in the repository code](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala#L34).
 
 # Trace all the things
-When running a modern high-throughput application it is important to have an ability to profile and monitor different parts of the application. 
-As always there are several ways of doing it. In our train station simulator we will use tracing.
+When running a modern high-throughput application it is important to have the ability to profile and monitor different parts of the application.
+As always there are several ways of doing it. In our train station simulator, we will use tracing.
 We won't use any specific tracing library but if you are looking for one, I would recommend having a look at [Trace4Cats](https://github.com/janstenpickle/trace4cats) or [Natchez](https://github.com/tpolecat/natchez).
 We will create our own dummy tracing service, which will encapsulate the actual implementation.
 It will have one simple method `traced`:
@@ -332,12 +332,12 @@ def make[F[_]: FlatMap: StructuredLogger: WithCtx]: Tracing[F] = new Tracing[F] 
     }
 }
 ```
-As you can see, we just pretend to do tracing here. 
-However, we are pretty serious with extracting context from our effect.
-In the previous part we were talking about having a separate effect with a context. Now we have a chance to try it out.
+As you can see, we just pretend to do tracing here.
+However, we are pretty serious about extracting context from our effect.
+In the previous part, we were talking about having a separate effect with a context. Now we have a chance to try it out.
 Above, you can see a method `askF` which asks the `Context` from the effect.
-We are able to use this method we have added `WithCtx` boundary, which is a type alias to `WithContext[F, Context]`. 
-`WithContext` provides context information which can be explicitly requested.  
+We are able to use this method we have added the `WithCtx` boundary, which is a type alias to `WithContext[F, Context]`.
+`WithContext` provides context information that can be explicitly requested.  
 
 After getting the context we build our contextual `Map`, where we store `traceId` and operation name. 
 This is logged and chained with the actual effect `fa`.
@@ -348,13 +348,13 @@ private class Trace[F[_]: Tracing] extends Departures[Mid[F, *]] {
   def register(departure: Departure): Mid[F, Departed] = _.traced("train departure: register")
 }
 ```
-We have a `Mid` called `Trace`, which requires `Tracing` class, which we've implemented above. 
-For the better user experience we've implemented `traced` extension method in `Tracing` companion object, 
-that allows us to call `traced` method straight on the effect. 
+We have a `Mid` called `Trace`, which requires `Tracing` class, which we've implemented above.
+For a better user experience, we've implemented `traced` extension method in `Tracing` companion object,
+that allows us to call `traced` method straight on the effect.
 See the full `Tracing` code [here](https://github.com/psisoyev/train-station-tofu/blob/master/service/src/main/scala/com/psisoyev/train/station/Tracing.scala).
 
-So now, by using a simple context reader and `Mid` we have cleaned up our main logic from tracing utilities. 
-All the code is fully decoupled and can be easily edited, replaced or even removed.
+So now, by using a simple context reader and `Mid` we have cleaned up our main logic from tracing utilities.
+All the tracing related code is fully decoupled and can be easily edited, replaced, or even removed.
 
 # Context aware logging
 # JSON formatted logs
