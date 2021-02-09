@@ -26,8 +26,7 @@ In this article I will show you how to:
 * split runtime effect from application initialization effect;
 * enable context-aware tracing;
 * enable context-aware logging;
-* enable JSON formatted logging;
-* ???
+* enable JSON formatted logging.
 
 I can't say that you *must* use all of that in your application as you and your team can already have built your own habits and style. 
 My personal feeling is that Tagless Final is a great way of describing your application, however, sometimes the current ecosystem lacks some tooling. 
@@ -46,7 +45,7 @@ An important thing to mention is that the toolkit is not a `cats`/`cats-effect`/
 I can't say something like "I'm using tofu stack". There is no "tofu stack". 
 The idea of the toolkit is to improve your Tagless Final code for whatever effect runtime system you have.
 
-# %Mid title% ???
+# Separate utilities from the core using `Mid`
 The first thing we will see today is how to clean up application business logic from cross-cutting concerns surrounding the core of the logic.
 For this, we will use a class called `Mid`.
 It might slightly remind you of aspect-oriented programming.  
@@ -435,7 +434,29 @@ After setting up the layout logs are presented in JSON format:
 ```
 
 # Summary
- 
+In this article, we've improved the code of `train-station` app from the [previous article](https://scala.monster/train-station/).
+We have used several new libraries - `derevo` and `log4cats`.
+Most importantly we tried a fresh dish from Scala chefs - [Tofu](https://github.com/TinkoffCreditSystems/tofu).
+
+Using the Tofu toolkit we improved our Tagless Final code.
+Now it's modular, cleaned up from utilities and we have added a few new things to the code.
+We've added a naive tracing, which of course is just logging under the hood, but you can easily replace its implementation with a library of your choice without doing any other changes in the business logic.
+Also, we have extracted effect context which contained user information.
+This ended up with a separation of the effects: one is used to initialize the logic and the other is used to run it.
+If improving the app even further, we could split the current context into 2:
+* For user requests - containing request and user information;
+* For other system requests - containing correlation id and source of the event.
+This would increase the number of effect types in the app to 3. But for sure it's not something to be afraid of.
+We've seen that from an application logic perspective we don't even care about the effect count.
+We can have even 5 or 10 different effects with different contexts and with different behaviors.
+This wouldn't make application logic more complex, it actually would make it even simpler.
+The only complex part would be wiring - you would have to work with those 10 different effects in your `Main` class.
+
+Similarly to some other functional libraries at the very beginning finding a required implicit could be challenging.
+As soon as you figure out the packaging patterns which are very straight-forward you will see Tagless Final in a much simpler way.
+As always, the full code of the app is available on [GitHub](https://github.com/psisoyev/train-station-tofu).
+
+The community of the toolkit is very friendly and if you have questions you can always ask them in [Discord](https://discord.com/invite/qPD5GGH) or [Telegram](https://t.me/tofu_ru).
 
 Let me know if you have any questions or suggestions in the comment section! Feedback is also very welcome, thank you!
 Cheers!
