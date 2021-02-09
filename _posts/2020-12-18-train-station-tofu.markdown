@@ -446,6 +446,7 @@ This ended up with a separation of the effects: one is used to initialize the lo
 If improving the app even further, we could split the current context into 2:
 * For user requests - containing request and user information;
 * For other system requests - containing correlation id and source of the event.
+
 This would increase the number of effect types in the app to 3. But for sure it's not something to be afraid of.
 We've seen that from an application logic perspective we don't even care about the effect count.
 We can have even 5 or 10 different effects with different contexts and with different behaviors.
