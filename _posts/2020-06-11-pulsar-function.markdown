@@ -6,6 +6,7 @@ description: This post introduces Pulsar Functions in Scala
 img: neutron-function/function.png
 tags: [scala, apache pulsar, serverless, neutron]
 comments: true
+hidden: true
 ---
 
 Data is important blablabla
