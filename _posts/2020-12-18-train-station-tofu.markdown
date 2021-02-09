@@ -165,7 +165,7 @@ Luckily, the easiest way to get an instance of it is to simply add an annotation
 @derive(applyK)
 trait Departures[F[_]] {
 ```
-This `derive` annotation comes from another cool library called [`derevo`](https://github.com/manatki/derevo). 
+This `derive` annotation comes from another cool library called [`derevo`](https://github.com/tofu-tf/derevo). 
 The purpose of this library is various instance derivation using a single macro annotation.
 
 Now the code compiles and we can be happy about having cleaner business logic. 
@@ -357,10 +357,85 @@ So now, by using a simple context reader and `Mid` we have cleaned up our main l
 All the tracing related code is fully decoupled and can be easily edited, replaced, or even removed.
 
 # Context aware logging
-# JSON formatted logs
+Similarly to tracing, we can use effect context to provide request data in logging.
+This could be used to log tracing information as we already did or, for example, user information (eg. `userId`).
+We actually already have seen the usage of structured logging, when we talked about tracing.
+There we were getting `traceId` from `Context`.
+
+It is OK to have several different logger instances per application. Sometimes, one can have a logger instance per service.
+In the case of `train-station` app we will have 2:
+* for logging Pulsar events;
+* for logging business events.
+  The former has a specific context: `topic` and `flow` (message direction).
+  The latter also can have some context: `traceId` and `userId`.
+  These contexts are different, so we will create 2 different logger instances in the `Main` class:
+```scala
+for {
+  pulsar <- ZLogs.uio.byName("pulsar").map(_.widen[Init])
+  global <- ZLogs.withContext[Context].byName("global").map(_.widen[Run])
+  _      <- startApp(global, pulsar)
+} yield ()
+```
+There is a special helper to create logger instances -`tofu.logging.Logs`.
+As we are using `ZIO` as the main effect type, for a better user experience there is a special version of `Logs` called `ZLogs`.
+`pulsar` logger is created with `Init` effect, in this case, it's just a `Task` (`ZIO[Nothing, Throwable, A]`).
+This effect doesn't require a context, as Pulsar library `neutron` will provide the context when creating event logger.
+However, the `global` logger will be used with `Run` effect, which is aware of the `Context`: `ZIO[Context, Throwable, T]`.
+This means that every log entry logged by this logger will also contain information about the context.  
+Logger needs to know how to present information about the context.
+This information is provided using a special type class - `Loggable`.
+There are several ways of creating a `Loggable` instance:
+* Derive it from `Show`;
+* Create a no-op (empty) instance;
+* Create manually using `DictLoggable` for multi-field classes;
+* Create manually using `ToStringLoggable` for `.toString` representations;
+* Derive using `derevo`.
+  We've already used derivation library `derevo` in the project, so let's simply use it and save our precious time:
+```scala
+@derive(loggable)
+case class Context(traceId: TraceId, userId: UserId)
+```
+There is a small caveat - it doesn't work well with `estatico` newtypes, so we will have to add the implicit manually:
+```scala
+implicit def coercibleLoggable[A: Coercible[B, *], B: Loggable]: Loggable[A] =
+    Loggable[B].contramap[A](_.asInstanceOf[B])
+```
+
+To log contextual messages we will use `StructuredLogger` from `log4cats` library.
+Luckily, Tofu provides integration with `log4cats`, which can be imported with a special import:
+```scala
+import tofu.logging.log4cats._
+```
+Fortunately, we don't have anything to change in the business logic.  
+Except for effect context-bounds, where we have to put the new `Logging` trait:
+```scala
+def make[F[_]: Monad: GenUUID: Logging: DepartureError.Raising: Tracing](
+  city: City,
+  connectedTo: List[City]
+): Departures[F] = {
+```
+As the result, we will have `userId` logged in all the business logs without changing the business code.
+
+# Bonus track: JSON formatted logs
+As you are my favorite reader, I have a bonus track for you. 
+If there is a desire to use Elastic stack, it is convenient to write logs in JSON format. 
+This allows to index specific fields. For example, it could be useful when searching for log entries by `userId`.
+
+When using Tofu it is a matter of adding a special encoder to the `logback.xml` configuration:
+```xml
+<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+    <layout class="tofu.logging.ELKLayout"/>
+</encoder>
+```
+`ELKLayout` will do all the work. The full version of a sample configuration file can be [found here](https://github.com/psisoyev/train-station-tofu/blob/master/server/src/main/resources/logback.xml).
+
+After setting up the layout logs are presented in JSON format:
+```
+{"@timestamp":"2021-02-09T13:07:22.416Z","loggerName":"global","threadName":"zio-default-async-19","level":"INFO","message":"Train 123 successfully departed","traceId":"f0fc9786-ac3e-4c56-a685-6f7f43366a61","userId":"2101c02f-b53e-429f-9363-38c980a13122"}
+```
 
 # Summary
-Thank you for reading up to this point. 
+ 
 
 Let me know if you have any questions or suggestions in the comment section! Feedback is also very welcome, thank you!
 Cheers!
