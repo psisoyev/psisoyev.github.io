@@ -387,7 +387,7 @@ for {
 There is a special helper to create logger instances -`tofu.logging.Logs`.
 As we are using `ZIO` as the main effect type, for a better user experience there is a special version of `Logs` called `ZLogs`.
 `pulsar` logger is created with `Init` effect, in this case, it's just a `Task` (`ZIO[Nothing, Throwable, A]`).
-This effect doesn't require a context, as Pulsar library `neutron` will provide the context when creating event logger.
+This effect doesn't require a context, as the Pulsar library `neutron` will provide the context when creating event logger.
 However, the `global` logger will be used with `Run` effect, which is aware of the `Context`: `ZIO[Context, Throwable, T]`.
 This means that every log entry logged by this logger will also contain information about the context.  
 Logger needs to know how to present information about the context.
