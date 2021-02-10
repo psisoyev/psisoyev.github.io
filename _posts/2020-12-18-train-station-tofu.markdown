@@ -28,15 +28,6 @@ In this article I will show you how to:
 * enable context-aware logging;
 * enable JSON formatted logging.
 
-If you are particularly interested in one of the parts, jump straight to it:
-- [Separate utilities from the core using `Mid`](#separate-utilities-from-the-core-using-mid)
-- [Improved error handling](#improved-error-handling)
-- [Two effects for the price of one!](#two-effects-for-the-price-of-one)
-- [Trace all the things](#trace-all-the-things)
-- [Context aware logging](#context-aware-logging)
-- [Bonus track: JSON formatted logs](#bonus-track-json-formatted-logs)
-- [Summary](#summary)
-
 I can't say that you *must* use all of that in your application as you and your team can already have built your own habits and style. 
 My personal feeling is that Tagless Final is a great way of describing your application, however, sometimes the current ecosystem lacks some tooling. 
 The idea of this post is to show you how to improve this but it doesn't mean it will solve all your problems.
@@ -53,6 +44,15 @@ The toolkit has much more to offer you:
 An important thing to mention is that the toolkit is not a `cats`/`cats-effect`/`Monix`/`ZIO`/`YOURIO` killer. 
 I can't say something like "I'm using tofu stack". There is no "tofu stack". 
 The idea of the toolkit is to improve your Tagless Final code for whatever effect runtime system you have.
+
+If you are particularly interested in one of the parts of this article, jump straight to it:
+- [Separate utilities from the core using `Mid`](#separate-utilities-from-the-core-using-mid)
+- [Improved error handling](#improved-error-handling)
+- [Two effects for the price of one!](#two-effects-for-the-price-of-one)
+- [Trace all the things](#trace-all-the-things)
+- [Context aware logging](#context-aware-logging)
+- [Bonus track: JSON formatted logs](#bonus-track-json-formatted-logs)
+- [Summary](#summary)
 
 # Separate utilities from the core using `Mid`
 The first thing we will see today is how to clean up application business logic from cross-cutting concerns surrounding the core of the logic.
