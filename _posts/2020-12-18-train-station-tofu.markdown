@@ -285,7 +285,7 @@ This means `StationRoutes` should be aware of both effects:
 ```scala
 class StationRoutes[
   I[_]: Monad: GenUUID: DepartureError.Handling: ArrivalError.Handling,
-  F[_]: FlatMap: WithProvide[*[_], I, Context]
+  F[_]: FlatMap: RunsCtx[*[_], I]
 ](...)
 ```
 Here we have 2 effects: `I` which stands for initialization.
