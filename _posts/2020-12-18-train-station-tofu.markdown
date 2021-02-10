@@ -403,7 +403,7 @@ There are several ways of creating a `Loggable` instance:
 @derive(loggable)
 case class Context(traceId: TraceId, userId: UserId)
 ```
-There is a small caveat - it doesn't work well with `estatico` newtypes, so we will have to add the implicit manually:
+There is a small caveat - at the time of writing it [doesn't work](https://github.com/tofu-tf/derevo/issues/56) with `estatico` newtypes, so we will have to add the implicit manually:
 ```scala
 implicit def coercibleLoggable[A: Coercible[B, *], B: Loggable]: Loggable[A] =
     Loggable[B].contramap[A](_.asInstanceOf[B])
