@@ -450,7 +450,7 @@ Most importantly we tried a fresh dish from Scala chefs - [Tofu](https://github.
 Using the Tofu toolkit we improved our Tagless Final code.
 Now it's modular, cleaned up from utilities and we have added a few new things to the code.
 We've added a naive tracing, which of course is just logging under the hood, but you can easily replace its implementation with a library of your choice without doing any other changes in the business logic.
-Also, we have extracted effect context which contained user information.
+Also, we have extracted the effect context which contained user information.
 This ended up with a separation of the effects: one is used to initialize the logic and the other is used to run it.
 If improving the app even further, we could split the current context into 2:
 * For user requests - containing request and user information;
