@@ -14,7 +14,7 @@ The system was developed in Scala using the Tagless Final technique.
 In this article, I would like to introduce you to a cool kid on the block that you might not know yet.
 Meet [Tofu](https://github.com/TinkoffCreditSystems/tofu) - a functional programming toolkit aimed at taming the complexity of Tagless Final approach.
 I will show how you can use utilities from Tofu to improve your codebase.
-However, I must warn you that some of the concepts might seem advanced and look complex at the first sight but are actually pretty simple when you have a closer look.
+However, I must warn you that some of the concepts might seem advanced and look complex at first sight but are actually pretty simple when you have a closer look.
 
 In order to compare code improved with Tofu with traditional Tagless Final application, I've cloned the [train-station](https://github.com/psisoyev/train-station) repository.
 We will use the same application to improve it with Tofu and then we will be able to compare the results.
@@ -71,7 +71,7 @@ Let's first agree on what is the core implementation logic of departure registra
 In our case, it is a generation of a random UUID and the creation of an event, which we return as the result of registration.
 Let's extract it to a separate class and call it `Impl` (or `Core`, if you wish):
 ```scala
-class Impl[F[_]: Applicative: GenUUID](city: City) extends Departures[F] {
+class Impl[F[_]: Functor: GenUUID](city: City) extends Departures[F] {
   override def register(departure: Departure): F[Departed] =
     F.randomUUID.map { id =>
       Departed(
@@ -90,12 +90,12 @@ The application can work only having this and the rest is not important.
 Ok, validating input data is also important, but we could survive without it.
 We can clearly see the required [context bounds](https://docs.scala-lang.org/tutorials/FAQ/context-bounds.html) for the implementation:
 * `GenUUID` to generated unique id;
-* `Applicative` to apply a function on the result.
+* `Functor` to apply a function on the result.
 
 As now we have a separate class with the core logic, let's create classes for our "not so important" logic.  
 We start with logging:
 ```scala
-class Log[F[_]: FlatMap: Logger] extends Departures[Mid[F, *]] {  
+class Log[F[_]: Apply: Logger] extends Departures[Mid[F, *]] {  
   override def register(departure: Departure): Mid[F, Departed] = { registration =>
     val before = F.info(s"Registering $departure")
     val after  = F.info(s"Train ${departure.id.value} successfully departed")
@@ -104,13 +104,13 @@ class Log[F[_]: FlatMap: Logger] extends Departures[Mid[F, *]] {
   }
 }
 ```
-Here we require `FlatMap` to chain effectful function calls and a logger to actually do the logging.
+Here we require `Apply` to chain effectful function calls and a logger to actually do the logging.
 If you have read the code carefully you could notice that now we extend the `Departures` trait not with just the effect type as we did with the core logic, but with `Mid` -
 `extends Departures[Mid[F, *]]`. Also, the return type of registration is not a simple event wrapped in `F` but is a `Mid`.
 As for a casual user, we won't even notice a difference.
 Again we have to override `register` method. This time as we use `Mid`, we receive a new input - the result of the `registration` of type `F[Departed]`.
 We basically surround the resulting effect with two other effects - a log before and a log after the registration.
-The ice-cream symbols `*>` and `<*` are just symbolic aliases to `flatMap` method which drops the output.
+The ice-cream symbols `*>` and `<*` are just symbolic aliases to `productR`/`productL` methods which drops the output.
 Aand that's it. We don't need anything else here for logging.
 
 Similarly to `Log` class we create one for validation:
