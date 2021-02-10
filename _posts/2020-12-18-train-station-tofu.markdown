@@ -81,7 +81,7 @@ The application can work only having this and the rest is not important.
 Ok, validating input data is also important, but we could survive without it.
 We can clearly see the required [context bounds](https://docs.scala-lang.org/tutorials/FAQ/context-bounds.html) for the implementation:
 * `GenUUID` to generated unique id;
-* `Functor` to apply a function on the result.
+* `Applicative` to apply a function on the result.
 
 As now we have a separate class with the core logic, let's create classes for our "not so important" logic.  
 We start with logging:
