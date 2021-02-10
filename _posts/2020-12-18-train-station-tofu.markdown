@@ -28,6 +28,15 @@ In this article I will show you how to:
 * enable context-aware logging;
 * enable JSON formatted logging.
 
+If you are particularly interested in one of the parts, jump straight to it:
+- [Separate utilities from the core using `Mid`](#separate-utilities-from-the-core-using-mid)
+- [Improved error handling](#improved-error-handling)
+- [Two effects for the price of one!](#two-effects-for-the-price-of-one)
+- [Trace all the things](#trace-all-the-things)
+- [Context aware logging](#context-aware-logging)
+- [Bonus track: JSON formatted logs](#bonus-track-json-formatted-logs)
+- [Summary](#summary)
+
 I can't say that you *must* use all of that in your application as you and your team can already have built your own habits and style. 
 My personal feeling is that Tagless Final is a great way of describing your application, however, sometimes the current ecosystem lacks some tooling. 
 The idea of this post is to show you how to improve this but it doesn't mean it will solve all your problems.
