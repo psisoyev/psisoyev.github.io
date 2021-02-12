@@ -175,6 +175,8 @@ trait Departures[F[_]] {
 ```
 This `derive` annotation comes from another cool library called [`derevo`](https://github.com/tofu-tf/derevo). 
 The purpose of this library is various instance derivation using a single macro annotation.
+Here it derives an `ApplyK` instance from `cats-tagless` library. 
+Note that `ApplyK` requires the trait to have methods only with `A => F[B]` signatures.
 
 Now the code compiles and we can be happy about having cleaner business logic. 
 Here is the [link to the final code](https://github.com/psisoyev/train-station-tofu/blob/master/service/src/main/scala/com/psisoyev/train/station/departure/Departures.scala#L24).
@@ -291,7 +293,8 @@ class StationRoutes[
 Here we have 2 effects: `I` which stands for initialization.
 From the signature, we know that we will chain computations using this effect, generate new unique IDs, and handle business errors.
 The second effect `F` is slightly more interesting. We know how to `flatMap` it, but also we know how to provide `Context` to run it.   
-When we run this effect, it is converted to `I` and the result of it can be used later together with the first effect.
+When we run this effect, it is converted to `I` and the result of it can be used later together with the first effect. 
+This is the end of the world for `F` and the context.
 
 We will use this approach to provide tracing (`traceId`) and user (`userId`) information to business logic services.
 First, let's have a look at the `Context` class we already used in the context-bound above:
