@@ -111,7 +111,7 @@ As for a casual user, we won't even notice a difference.
 Again we have to override `register` method. This time as we use `Mid`, we receive a new input - the result of the `registration` of type `F[Departed]`.
 We basically surround the resulting effect with two other effects - a log before and a log after the registration.
 The ice-cream symbols `*>` and `<*` are just symbolic aliases to `productR`/`productL` methods which drops the output.
-Aand that's it. We don't need anything else here for logging.
+That's it. We don't need anything else here for logging.
 
 Similarly to `Log` class we create one for validation:
 ```scala
