@@ -348,7 +348,7 @@ As you can see, we just pretend to do tracing here.
 However, we are pretty serious about extracting context from our effect.
 In the previous part, we were talking about having a separate effect with a context. Now we have a chance to try it out.
 Above, you can see a method `askF` which asks the `Context` from the effect.
-We are able to use this method we have added the `WithCtx` boundary, which is a type alias to `WithContext[F, Context]`.
+We are able to use this method since we have added the `WithCtx` boundary, which is a type alias to `WithContext[F, Context]`.
 `WithContext` provides context information that can be explicitly requested.  
 
 After getting the context we build our contextual `Map`, where we store `traceId` and operation name. 
