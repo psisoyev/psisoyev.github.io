@@ -198,7 +198,7 @@ There are more ideas what you could extract to `Mid`:
 
 Another bonus of having core logic extracted is that it's possible to substitute the logic itself without changing the plumbing around.
 It means that logging, monitoring, tracing, and all the other utilities will stay as-is.
-You can read more about `Mid` in [Tofu docs](https://docs.tofu.tf/docs/mid). 
+You can read more about `Mid` in the [official Tofu docs](https://docs.tofu.tf/docs/mid). 
 
 # Improved error handling
 Error handling is always a great topic for a holy war on the Internet.
@@ -261,7 +261,8 @@ def handleDepartureErrors: DepartureError => I[Response[I]] = {
 }
 ```
 Similarly to `DepartureError` we create one for `ArrivalError`. 
-The final code with error handling is available in [the repository](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala).    
+The final code with error handling is available in [the repository](https://github.com/psisoyev/train-station-tofu/blob/master/route/src/main/scala/com/psisoyev/train/station/StationRoutes.scala).
+More about error handling with Tofu you can read in the [official docs](https://docs.tofu.tf/docs/errors).
 
 # Two effects for the price of one!
 Have you ever considered having two effect types in your Tagless Final application?
@@ -427,6 +428,10 @@ def make[F[_]: Monad: GenUUID: Logging: DepartureError.Raising: Tracing](
 ): Departures[F] = {
 ```
 As the result, we will have `userId` logged in all the business logs without changing the business code.
+Some people may get concerned that they don't want some fields to get logged. 
+This could be a case for passwords, user bank card numbers etc. 
+For this Tofu provides you with special annotations `@hidden` and `@masked` that will hide or partially obfuscate sensitive data.  
+You can read more about it in the [official Tofu docs](https://docs.tofu.tf/docs/logging).
 
 # Bonus track: JSON formatted logs
 As you are my favorite reader, I have a bonus track for you. 
