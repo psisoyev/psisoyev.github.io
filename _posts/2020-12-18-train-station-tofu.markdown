@@ -198,6 +198,7 @@ There are more ideas what you could extract to `Mid`:
 
 Another bonus of having core logic extracted is that it's possible to substitute the logic itself without changing the plumbing around.
 It means that logging, monitoring, tracing, and all the other utilities will stay as-is.
+You can read more about `Mid` in [Tofu docs](https://docs.tofu.tf/docs/mid). 
 
 # Improved error handling
 Error handling is always a great topic for a holy war on the Internet.
