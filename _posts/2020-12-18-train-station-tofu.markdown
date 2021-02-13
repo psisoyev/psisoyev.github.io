@@ -105,7 +105,7 @@ class Log[F[_]: Apply: Logger] extends Departures[Mid[F, *]] {
 }
 ```
 Here we require `Apply` to chain effectful function calls and a logger to actually do the logging.
-If you have read the code carefully you could notice that now we extend the `Departures` trait not with just the effect type as we did with the core logic, but with `Mid` -
+If you have read the code carefully you could notice that the `Departures` trait now has `Mid` with `F` in the type parameter:
 `extends Departures[Mid[F, *]]`. Also, the return type of registration is not a simple event wrapped in `F` but is a `Mid`.
 As for a casual user, we won't even notice a difference.
 Again we have to override `register` method. This time as we use `Mid`, we receive a new input - the result of the `registration` of type `F[Departed]`.
