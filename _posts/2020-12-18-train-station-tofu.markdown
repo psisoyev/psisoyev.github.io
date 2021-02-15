@@ -12,7 +12,7 @@ hidden: true
 In my previous blog post, I've created an event-driven system built on top of Apache Pulsar.
 The system was developed in Scala using the Tagless Final technique.
 In this article, I would like to introduce you to a cool kid on the block that you might not know yet.
-Meet [Tofu](https://github.com/TinkoffCreditSystems/tofu) - a functional programming toolkit aimed at taming the complexity of Tagless Final approach.
+Meet [Tofu](https://github.com/tofu-tf/tofu) - a functional programming toolkit aimed at taming the complexity of Tagless Final approach.
 I will show how you can use utilities from Tofu to improve your codebase.
 However, I must warn you that some of the concepts might seem advanced and look complex at first sight but are actually pretty simple when you have a closer look.
 
@@ -32,7 +32,7 @@ I can't say that you *must* use all of that in your application as you and your 
 My personal feeling is that Tagless Final is a great way of describing your application, however, sometimes the current ecosystem lacks some tooling. 
 The idea of this post is to show you how to improve this but it doesn't mean it will solve all your problems.
 You can use only part of the toolkit to solve particular problems. For that, the toolkit is split into several sub-modules. 
-More info on this you can find in the [README file](https://github.com/TinkoffCreditSystems/tofu#quick-start).
+More info on this you can find in the [README file](https://github.com/tofu-tf/tofu#quick-start).
 
 The toolkit has much more to offer you:
 * Agent - `Ref` on steroids, which allows effectful updates;
@@ -230,7 +230,7 @@ The result of this search is an `Option`.
 In the import section, we add syntactic sugar import `import tofu.syntax.raise._`.
 It contains the method `orRaise` which we call on `Option`.
 If it is empty, we will raise an error, that we will have to handle later on.
-There are other convenience methods to raise an error in different situations that can be found [here](https://github.com/TinkoffCreditSystems/tofu/blob/4337b6370ab0e7251ba87c02d1901e7d82f65b6b/core/src/main/scala/tofu/syntax/error.scala#L43).
+There are other convenience methods to raise an error in different situations that can be found [here](https://github.com/tofu-tf/tofu/blob/4337b6370ab0e7251ba87c02d1901e7d82f65b6b/core/src/main/scala/tofu/syntax/error.scala#L43).
 In my opinion, the easiest way to learn all the syntactic sugar is by reading the code.
 
 Of course, using syntactic sugar is not mandatory. There is always an option to call method `raise` on your effect as we did with `map` of `flatMap`:
@@ -454,7 +454,7 @@ After setting up the layout logs are presented in JSON format:
 # Summary
 In this article, we've improved the code of `train-station` app from the [previous article](https://scala.monster/train-station/).
 We have used several new libraries - `derevo` and `log4cats`.
-Most importantly we tried a fresh dish from Scala chefs - [Tofu](https://github.com/TinkoffCreditSystems/tofu).
+Most importantly we tried a fresh dish from Scala chefs - [Tofu](https://github.com/tofu-tf/tofu).
 
 Using the Tofu toolkit we improved our Tagless Final code.
 Now it's modular, cleaned up from utilities and we have added a few new things to the code.
