@@ -159,11 +159,11 @@ In the code above, we have `log |+| validate`.
 Logging is the outer wrapper and validation is the inner. 
 It means that the order of the execution will be the following:
 ```
-logging_pre
-validation_pre
+logging_before
+validation_before
 action
-validation_post
-logging_post
+validation_after
+logging_after
 ```
 
 We are missing the one last thing - we can't combine (`|+|`) `Mid` instances without an implicit `ApplyK` in the scope.
