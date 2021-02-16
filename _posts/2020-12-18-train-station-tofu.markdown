@@ -3,10 +3,10 @@ layout: post
 title: Upgrade your Tagless Final with Tofu
 date: 2020-12-18 13:37:00 +0100
 description: This post introduces Tofu toolkit to Scala developers
-img: train-station/trains-tofu.png
+img: train-station/trains-tofu.jpg
 tags: [scala, apache pulsar, neutron, zio, tagless final, fs2, tofu]
 comments: true
-hidden: true
+hidden: false
 ---
 
 In my previous blog post, I've created an event-driven system built on top of Apache Pulsar.
