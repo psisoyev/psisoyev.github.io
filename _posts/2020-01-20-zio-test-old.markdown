@@ -13,9 +13,9 @@ In the [previous article](https://scala.monster/welcome-zio/) we were exploring 
 We've built the [release pager](https://scala.monster/design-a-pager/) application but we have skipped something very important - unit tests.
 In this article, we will continue to develop the application and we will write tests for it.
 Full versions of the code snippets I will use in this article are available on [GitHub](https://github.com/psisoyev/release-pager/tree/chapter1/service/src/test/scala/io/pager).    
-Please note that we will be using ZIO version `1.0.0-RC17`. 
-We should expect to see ZIO Test API changes in the next release candidate (which will be the last before the official release). 
-If you would like to read an article based on version `1.0.0-RC18` - [click here](https://scala.monster/zio-test/). 
+
+**Warning! This blog post is outdated and is based on an old ZIO version `1.0.0-RC17`.** 
+Please [check out the updated post with the new ZIO test features](https://scala.monster/zio-test/). 
 
 ZIO has its own ecosystem and provides developer tools to increase development efficiency.
 One of the things which are included in the ZIO toolbox is ZIO Test framework.

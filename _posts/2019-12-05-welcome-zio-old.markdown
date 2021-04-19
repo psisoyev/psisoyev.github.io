@@ -19,6 +19,9 @@ On certain topics, I will not go into the details, but rather provide links to a
 The intent of this post is to familiarize you with the library on a high level. 
 In the next chapters, I would like to cover more specific parts of ZIO ecosystem and guide you in a deep dive into the different parts of the library.
 
+**Warning! This blog post is outdated and is based on an old ZIO version `1.0.0-RC17`.**
+Please [check out the updated post with the new ZIO features](https://scala.monster/welcome-zio/).
+
 Please note that we will be using ZIO version `1.0.0-RC17`. 
 We should expect to see ZIO API changes in the next release candidate (which will be the last before the official release). 
 If you would like to read an article based on version `1.0.0-RC18` - [click here](https://scala.monster/welcome-zio/).
